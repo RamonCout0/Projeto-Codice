@@ -66,6 +66,100 @@ NAVICity.
 
 > A primeira etapa se encerra aos 18 anos.
 
+## Rodando no celular
+
+Precisa do Flutter 3.32+ e do JDK 17. Ative a depuração USB no Android,
+conecte o cabo e, na pasta do projeto:
+
+```sh
+flutter pub get
+flutter devices   # o celular tem que aparecer aqui
+flutter run       # instala e abre no aparelho
+```
+
+Para gerar um APK e mandar para o celular: `flutter build apk --debug`
+(o arquivo sai em `build/app/outputs/flutter-apk/`). No PC, o app aparece
+dentro de uma moldura de celular; no aparelho ele ocupa a tela toda.
+
+## Conversa com o Gemma (Ollama no PC)
+
+A conversa usa o **gemma3:1b** rodando no [Ollama](https://ollama.com), no
+PC. O modelo (~800 MB) não vai para o GitHub: cada máquina instala o seu.
+
+1. Instale o Ollama e baixe o modelo:
+   ```sh
+   ollama pull gemma3:1b
+   ```
+2. Deixe o Ollama aceitar conexões da rede (o celular fala com o PC pelo
+   Wi-Fi). No Windows, crie a variável de ambiente `OLLAMA_HOST=0.0.0.0`,
+   feche o Ollama pela bandeja e abra de novo. Se o Firewall perguntar,
+   libere a rede privada (porta 11434).
+3. Descubra o IP do PC (`ipconfig`, linha "Endereço IPv4") e, no app, abra
+   **Menu → Configurações** e coloque `http://IP-DO-PC:11434`. Toque em
+   "salvar e testar".
+
+Celular e PC precisam estar na mesma rede Wi-Fi. No emulador Android o
+endereço padrão `http://10.0.2.2:11434` já aponta para o PC. Também dá para
+fixar o endereço na hora de rodar:
+`flutter run --dart-define=OLLAMA_URL=http://192.168.0.10:11434`.
+
+A NAVI recebe as memórias guardadas no Diário junto com cada pergunta.
+
+## NAVI em 3D (VRM)
+
+O app mostra a NAVI em 3D a partir de um modelo **.vrm** (o formato do
+VRoid). O modelo é importado no próprio celular: **Menu → Importar NAVI**
+(ou "trocar NAVI" na Home). Copie o `.vrm` para o celular por cabo, Drive ou
+e-mail e escolha o arquivo. Nenhum `.vrm` vai para o repositório, porque cada
+modelo tem a sua licença (a Alice, por exemplo, não permite redistribuir).
+
+Na mesma tela dá para importar **animações prontas (.vrma)**, como as do
+VRoid Motion Pack, em três momentos:
+
+| Animação | Quando toca |
+| --- | --- |
+| Parada | o tempo todo, em repetição |
+| Aceno | quando você toca na NAVI |
+| Comemorar | quando ela fica feliz |
+
+Sem os `.vrma`, a NAVI usa movimentos simples feitos pelo próprio app
+(respirar, balançar e acenar). Por cima de qualquer animação, o app controla
+o rosto: pisca, muda a expressão conforme o humor e mexe a boca enquanto o
+Gemma responde. A foto pequena da NAVI (Diário, Conversa, menu) é tirada do
+próprio modelo depois que ele carrega.
+
+O 3D roda numa WebView com [three.js](https://threejs.org) e
+[three-vrm](https://github.com/pixiv/three-vrm). O código fica em `navi_3d/`
+e é empacotado em `assets/navi_3d/navi.js`. Para alterar:
+
+```sh
+cd navi_3d
+npm install
+npm run build
+```
+
+No PC (Windows) o 3D não aparece: o app usa a imagem da Frost.
+
+## Organização do código
+
+```
+lib/
+  main.dart          ponto de entrada
+  app/               MaterialApp, Provider, rotas, abas e moldura do PC
+  tema/              visual: cores, estilos de texto, ThemeData, imagens
+  widgets/           componentes compartilhados (AvatarNavi, Navi3D, Painel…)
+  models/ data/      dados: memórias, mensagens, lugares, humor, ajustes
+  services/          diário, conversa com o Gemma e arquivos/servidor do 3D
+  controllers/       estado compartilhado entre telas (memórias, apelidos)
+  views/<tela>/      cada tela na sua pasta, com as partes dela ao lado
+navi_3d/             visualizador VRM (JavaScript) usado pela WebView
+```
+
+Nenhuma tela declara cor ou estilo solto: tudo vem de `tema/`. A NAVI só é
+desenhada pelo `widgets/avatar_navi.dart`.
+
+As atividades entregues para a disciplina ficam na branch `Atividades`.
+
 ## Projeto acadêmico
 
 Desenvolvido para a disciplina de Desenvolvimento para Dispositivos Móveis por

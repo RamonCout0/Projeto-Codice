@@ -1,0 +1,16 @@
+{
+  "name": "navi-3d",
+  "private": true,
+  "description": "Visualizador VRM da NAVI. Gera assets/navi_3d/navi.js para o app Flutter.",
+  "scripts": {
+    "build": "esbuild src/navi.js --bundle --minify --format=iife --target=chrome90 --outfile=../assets/navi_3d/navi.js"
+  },
+  "dependencies": {
+    "@pixiv/three-vrm": "3.5.5",
+    "@pixiv/three-vrm-animation": "3.5.5",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

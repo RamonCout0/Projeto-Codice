@@ -74,3 +74,11 @@ Desenvolvido para a disciplina de Desenvolvimento para Dispositivos Móveis por
 **Referências:** Pokémon GO, Mega Man NT Warrior, POU e Waze.
 
 Link do Figma:https://www.figma.com/design/Do7j79OBvSKrucbwdNoc1S/C%C3%B3dice?node-id=0-1&t=tFKnwnIfS7nye4Rc-1
+
+## Comunicação segura
+
+A atividade integra login JWT e consulta protegida à versão principal com Provider (`AtvNavegacao_provider.dart`). A entrada pelo Códice abre a autenticação e, depois da consulta, dá acesso às telas de diário, cidade e encontros.
+
+- [Atividade de comunicação segura](COMUNICACAO_SEGURA.md)
+- [Relatório da atividade](Relatorio_Comunicacao_Segura.pdf)
+- [Dependências do Flutter](pubspec.yaml)

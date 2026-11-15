@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'frost_assets.dart';
+import 'AtvComunicacaoSegura.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -76,6 +77,7 @@ class Rotas {
 
   static const String login = '/';
   static const String app = '/app';
+  static const String sessao = '/sessao';
   static const String configuracoes = '/configuracoes';
 
   static const String navi = '/navi';
@@ -91,6 +93,9 @@ class Rotas {
   static final Map<String, WidgetBuilder> mapa = {
     login: (_) => const WelcomeScreen(),
     app: (_) => const AppShell(),
+    sessao: (_) => SessaoSeguraScreen(aoContinuar: (context) {
+      Navigator.of(context).pushNamed(app);
+    }),
     configuracoes: (_) => const ConfiguracoesScreen(),
   };
 
@@ -283,11 +288,8 @@ class PhoneFrame extends StatelessWidget {
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
-  /// Login → app. pushReplacement: o login sai da pilha, então o
-  /// voltar do Android dentro do app não cai de novo nesta tela.
-  void goToApp(BuildContext context) {
-    debugPrint('[login] entrando: pushReplacementNamed(${Rotas.app})');
-    Navigator.of(context).pushReplacementNamed(Rotas.app);
+  void abrirSessao(BuildContext context) {
+    Navigator.of(context).pushNamed(Rotas.sessao);
   }
 
   @override
@@ -423,7 +425,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 42,
                 child: ElevatedButton(
-                  onPressed: () => goToApp(context),
+                  onPressed: () => abrirSessao(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPurple,
                     foregroundColor: const Color(0xFF0D0B13),
@@ -433,7 +435,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'criar meu NAVI',
+                    'entrar para criar meu NAVI',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -446,7 +448,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 42,
                 child: OutlinedButton(
-                  onPressed: () => goToApp(context),
+                  onPressed: () => abrirSessao(context),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Color(0xFF474252)),

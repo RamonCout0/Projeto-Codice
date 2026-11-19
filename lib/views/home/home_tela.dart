@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/views/home/palco_navi.dart';
@@ -22,23 +24,7 @@ class HomeTela extends StatelessWidget {
       children: const [
         CabecalhoAba('Home'),
         SizedBox(height: 12),
-        Row(
-          children: [
-            Text('Frost', style: Estilos.titulo),
-            SizedBox(width: 10),
-            Flexible(
-              child: Pilula(
-                '8 anos • criança',
-                cor: Cores.textoSecundario,
-                fundo: Cores.painel,
-                borda: Color(0xFF383345),
-              ),
-            ),
-            SizedBox(width: 10),
-            Spacer(),
-            _BotaoImportar(),
-          ],
-        ),
+        _Identidade(),
         SizedBox(height: 14),
         PalcoNavi(),
         SizedBox(height: 14),
@@ -62,6 +48,57 @@ class HomeTela extends StatelessWidget {
   }
 }
 
+/// Nome e elemento do NAVI; tocar abre a personalidade.
+class _Identidade extends StatelessWidget {
+  const _Identidade();
+
+  @override
+  Widget build(BuildContext context) {
+    final perfil = context.watch<Sessao>().perfil;
+    final elemento = perfil.elemento;
+    return Row(
+      children: [
+        Flexible(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamed(Rotas.perfil),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      perfil.nome,
+                      style: Estilos.titulo,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.edit_outlined, size: 14, color: Cores.textoFraco),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Pilula(
+          '${elemento.titulo} · 8 anos',
+          icone: elemento.icone,
+          cor: elemento.cor,
+          fundo: elemento.cor.withValues(alpha: 0.1),
+          borda: elemento.cor.withValues(alpha: 0.35),
+        ),
+        const Spacer(),
+        const _BotaoImportar(),
+      ],
+    );
+  }
+}
+
 /// Atalho para a tela de importar o modelo 3D.
 class _BotaoImportar extends StatelessWidget {
   const _BotaoImportar();
@@ -69,7 +106,7 @@ class _BotaoImportar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Pilula(
-      'trocar NAVI',
+      '3D',
       icone: Icons.view_in_ar_outlined,
       onTap: () =>
           Navigator.of(context, rootNavigator: true).pushNamed(Rotas.importar),

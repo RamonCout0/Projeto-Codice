@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/codice_app.dart';
 import 'package:codice_app/controllers/estado_codice.dart';
@@ -16,6 +17,9 @@ class RaizCodice extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EstadoCodice()),
         ChangeNotifierProvider(create: (_) => Ajustes()..carregar()),
         ChangeNotifierProvider(create: (_) => ArquivosNavi()..carregar()),
+        // Conta e personalidade do NAVI (a sessão guardada é conferida na
+        // tela inicial).
+        ChangeNotifierProvider(create: (_) => Sessao()),
       ],
       child: const CodiceApp(),
     );

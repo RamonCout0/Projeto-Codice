@@ -62,36 +62,41 @@ class Pilula extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final raio = BorderRadius.circular(15);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: raio,
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: fundo,
-          borderRadius: raio,
-          border: borda == null ? null : Border.all(color: borda!),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icone != null) ...[
-              Icon(icone, color: cor, size: 13),
-              const SizedBox(width: 5),
-            ],
-            Flexible(
-              child: Text(
-                texto,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: cor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+    // Material próprio: o Ink pinta nele, e não num Material lá atrás (que
+    // ficaria escondido sob um cartão colorido).
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: raio,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: fundo,
+            borderRadius: raio,
+            border: borda == null ? null : Border.all(color: borda!),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icone != null) ...[
+                Icon(icone, color: cor, size: 13),
+                const SizedBox(width: 5),
+              ],
+              Flexible(
+                child: Text(
+                  texto,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: cor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

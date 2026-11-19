@@ -7,11 +7,14 @@ import 'package:path_provider/path_provider.dart';
 class Ajustes extends ChangeNotifier {
   /// Endereço do Ollama no PC. Dá para fixar na hora de rodar:
   /// flutter run --dart-define=OLLAMA_URL=http://192.168.0.10:11434
-  /// (10.0.2.2 é o próprio PC visto de dentro do emulador Android.)
-  static const enderecoPadrao = String.fromEnvironment(
-    'OLLAMA_URL',
-    defaultValue: 'http://10.0.2.2:11434',
-  );
+  /// Sem isso: na web o Ollama está no próprio PC (localhost); no Android,
+  /// 10.0.2.2 é o PC visto de dentro do emulador.
+  static const _enderecoFixo = String.fromEnvironment('OLLAMA_URL');
+  static final enderecoPadrao = _enderecoFixo.isNotEmpty
+      ? _enderecoFixo
+      : kIsWeb
+      ? 'http://localhost:11434'
+      : 'http://10.0.2.2:11434';
   static const modeloPadrao = 'gemma3:1b';
 
   String enderecoOllama = enderecoPadrao;

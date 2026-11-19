@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:codice_app/app/abas.dart';
 import 'package:codice_app/tema/cores.dart';
 
+/// Barra das abas (Material 3): a aba aberta ganha uma pílula roxa.
 class NavegacaoInferior extends StatelessWidget {
   final int selecionada;
   final ValueChanged<int> aoSelecionar;
@@ -18,31 +19,19 @@ class NavegacaoInferior extends StatelessWidget {
       decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: Cores.linha)),
       ),
-      child: BottomNavigationBar(
-        currentIndex: selecionada,
-        onTap: aoSelecionar,
-        type: BottomNavigationBarType.fixed,
+      child: NavigationBar(
+        selectedIndex: selecionada,
+        onDestinationSelected: aoSelecionar,
+        height: 62,
         backgroundColor: Cores.barra,
-        elevation: 0,
-        iconSize: 20,
-        selectedItemColor: Cores.roxo,
-        unselectedItemColor: const Color(0xFF898494),
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        items: [
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: Cores.roxoAtivo,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
           for (final aba in abas)
-            BottomNavigationBarItem(
-              icon: Icon(aba.icone),
-              activeIcon: Container(
-                width: 32,
-                height: 26,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF251B4B),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(aba.icone),
-              ),
+            NavigationDestination(
+              icon: Icon(aba.icone, color: Cores.textoApagado, size: 21),
+              selectedIcon: Icon(aba.icone, color: Cores.roxoClaro, size: 21),
               label: aba.nome,
             ),
         ],

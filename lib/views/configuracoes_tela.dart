@@ -113,7 +113,8 @@ class _ConfiguracoesTelaState extends State<ConfiguracoesTela> {
                   const SizedBox(height: 6),
                   const Text(
                     'no celular, use o IP do PC na mesma rede Wi-Fi. '
-                    'no emulador, http://10.0.2.2:11434.',
+                    'no emulador, http://10.0.2.2:11434. '
+                    'no navegador do PC, http://localhost:11434.',
                     style: Estilos.legenda,
                   ),
                 ],
@@ -123,7 +124,7 @@ class _ConfiguracoesTelaState extends State<ConfiguracoesTela> {
             const Divider(),
             _chave(
               'Falas em Navidês',
-              'tocar os bipes quando a Frost conversa com outro NAVI',
+              'tocar os bipes quando o seu NAVI conversa com outro',
               ajustes.falasEmNavides,
               (v) => ajustes.falasEmNavides = v,
             ),
@@ -135,7 +136,7 @@ class _ConfiguracoesTelaState extends State<ConfiguracoesTela> {
             ),
             _chave(
               'Relato da cidade',
-              'resumo do que a Frost fez na NAVICity enquanto você saiu',
+              'resumo do que o seu NAVI fez na NAVICity enquanto você saiu',
               ajustes.relatoDaCidade,
               (v) => ajustes.relatoDaCidade = v,
             ),

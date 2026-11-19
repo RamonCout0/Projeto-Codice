@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
@@ -40,9 +42,10 @@ class _ApelidoTelaState extends State<ApelidoTela> {
       child: ListView(
         children: [
           const CabecalhoDetalhe('Encontros / apelido'),
-          const TituloGrande(
+          TituloGrande(
             'Dar um apelido',
-            subtitulo: 'a Frost vai usar esse nome quando falar dele.',
+            subtitulo:
+                '${context.read<Sessao>().perfil.nome} vai usar esse nome quando falar dele.',
           ),
           Padding(
             padding: const EdgeInsets.all(20),

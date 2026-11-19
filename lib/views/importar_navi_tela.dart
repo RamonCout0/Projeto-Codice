@@ -8,7 +8,8 @@ import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/navi_3d.dart';
 
-/// Traz o modelo .vrm da NAVI e as animações .vrma para dentro do app.
+/// Traz o modelo .vrm da NAVI e as animações (.vrma ou .fbx do Mixamo)
+/// para dentro do app.
 /// Os arquivos ficam só neste aparelho.
 class ImportarNaviTela extends StatefulWidget {
   const ImportarNaviTela({super.key});
@@ -70,10 +71,12 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                               ),
                               Text(
                                 modelo == null
-                                    ? 'usando a imagem da Frost'
+                                    ? 'a NAVI fica vazia até você importar um'
+                                    : arquivos.modeloEmbutido
+                                    ? 'da pasta assets/navi_local do projeto'
                                     : Navi3D.suportado
                                     ? 'a foto aparece depois que ela carregar'
-                                    : 'o 3D aparece no celular',
+                                    : 'o 3D aparece no celular ou na web',
                                 style: Estilos.legenda,
                               ),
                             ],
@@ -89,12 +92,12 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                         : () => _executar(arquivos.importarModelo),
                     icon: const Icon(Icons.file_open_outlined, size: 18),
                     label: Text(
-                      modelo == null
-                          ? 'escolher arquivo .vrm'
-                          : 'trocar modelo',
+                      arquivos.modeloImportado
+                          ? 'trocar modelo'
+                          : 'escolher arquivo .vrm',
                     ),
                   ),
-                  if (modelo != null)
+                  if (arquivos.modeloImportado)
                     TextButton(
                       onPressed: _ocupado
                           ? null
@@ -105,17 +108,19 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                       child: const Text('remover modelo'),
                     ),
                   const SizedBox(height: 20),
-                  const Text('ANIMAÇÕES PRONTAS (.vrma)', style: Estilos.secao),
+                  const Text('ANIMAÇÕES (.vrma OU MIXAMO .fbx)', style: Estilos.secao),
                   const SizedBox(height: 4),
                   const Text(
-                    'opcional. sem elas, a NAVI usa movimentos simples feitos pelo app.',
+                    'opcional. sem elas, a NAVI usa movimentos simples feitos pelo app. '
+                    'do mixamo.com: baixe em FBX Binary, "Without Skin".',
                     style: Estilos.legenda,
                   ),
                   const SizedBox(height: 8),
                   for (final gesto in Gesto.values)
                     _LinhaAnimacao(
                       gesto: gesto,
-                      importada: arquivos.animacoes.containsKey(gesto),
+                      importada: arquivos.animacaoImportada(gesto),
+                      embutida: arquivos.animacoes.containsKey(gesto),
                       ocupado: _ocupado,
                       aoImportar: () =>
                           _executar(() => arquivos.importarAnimacao(gesto)),
@@ -130,7 +135,9 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                     child: Text(
                       'copie os arquivos para o celular (cabo, Drive, e-mail) '
                       'e escolha aqui. eles ficam só neste aparelho e não vão '
-                      'para o GitHub: cada modelo tem a sua licença.',
+                      'para o GitHub: cada modelo tem a sua licença. '
+                      'na web, o importado vale só até fechar a aba: para '
+                      'apresentar, use a pasta assets/navi_local.',
                       style: Estilos.legenda,
                     ),
                   ),
@@ -147,6 +154,9 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
 class _LinhaAnimacao extends StatelessWidget {
   final Gesto gesto;
   final bool importada;
+
+  /// Tem uma em assets/navi_local (vale quando nada foi importado).
+  final bool embutida;
   final bool ocupado;
   final VoidCallback aoImportar;
   final VoidCallback aoRemover;
@@ -154,6 +164,7 @@ class _LinhaAnimacao extends StatelessWidget {
   const _LinhaAnimacao({
     required this.gesto,
     required this.importada,
+    required this.embutida,
     required this.ocupado,
     required this.aoImportar,
     required this.aoRemover,
@@ -161,14 +172,17 @@ class _LinhaAnimacao extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tem = importada || embutida;
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(
-        importada ? Icons.check_circle : Icons.radio_button_unchecked,
-        color: importada ? Cores.verde : Cores.textoFraco,
+        tem ? Icons.check_circle : Icons.radio_button_unchecked,
+        color: tem ? Cores.verde : Cores.textoFraco,
       ),
       title: Text(gesto.titulo),
-      subtitle: Text(gesto.quando),
+      subtitle: Text(
+        importada || !embutida ? gesto.quando : '${gesto.quando} · do projeto',
+      ),
       trailing: importada
           ? IconButton(
               tooltip: 'remover',

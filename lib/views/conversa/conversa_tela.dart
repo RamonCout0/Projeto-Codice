@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/controllers/estado_codice.dart';
+import 'package:codice_app/data/lugares_demo.dart';
 import 'package:codice_app/models/ajustes.dart';
 import 'package:codice_app/models/humor.dart';
 import 'package:codice_app/models/mensagem.dart';
@@ -29,11 +32,92 @@ class _ConversaTelaState extends State<ConversaTela> {
   bool _falando = false;
   Humor _humor = Humor.esperando;
 
+  // O Gemma escreve mais rápido do que alguém fala. O texto que chega vai
+  // para uma fila e aparece em ritmo de fala, para a boca acompanhar.
+  static const _porLetra = Duration(milliseconds: 40); // ~25 letras/s
+  static final _emoji = RegExp(
+    r'[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}] ?',
+    unicode: true,
+  );
+  String _fila = '';
+  int _pausa = 0;
+  Timer? _relogio;
+
+  @override
+  void initState() {
+    super.initState();
+    // Assim que a aba existe, o Gemma já lê a personalidade e o diário.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _gemma().aquecer(_instrucoes(), _mensagens);
+    });
+  }
+
+  ConversaGemma _gemma() {
+    final ajustes = context.read<Ajustes>();
+    return ConversaGemma(endereco: ajustes.enderecoOllama, modelo: ajustes.modelo);
+  }
+
+  /// Personalidade (elemento, traços, gostos), a vida do NAVI no app e o
+  /// que o diário ensinou.
+  String _instrucoes() {
+    final estado = context.read<EstadoCodice>();
+    return ConversaGemma.instrucoes(
+      context.read<Sessao>().perfil,
+      estado.memorias,
+      lugares: lugares,
+      encontros: estado.navis,
+    );
+  }
+
   @override
   void dispose() {
+    _relogio?.cancel();
     _campo.dispose();
     _rolagem.dispose();
     super.dispose();
+  }
+
+  /// Mostra a fila letra a letra em [resposta]. Termina quando a fila
+  /// esvazia e [acabou] retorna true.
+  Future<void> _falarAos(Mensagem resposta, bool Function() acabou) {
+    final pronto = Completer<void>();
+    _relogio?.cancel();
+    _relogio = Timer.periodic(_porLetra, (relogio) {
+      if (!mounted) {
+        relogio.cancel();
+        if (!pronto.isCompleted) pronto.complete();
+        return;
+      }
+      if (_pausa > 0) {
+        _pausa--;
+        return;
+      }
+      if (_fila.isEmpty) {
+        if (acabou()) {
+          relogio.cancel();
+          if (!pronto.isCompleted) pronto.complete();
+        }
+        return;
+      }
+      // Uma letra (duas unidades quando for um par substituto).
+      final tamanho =
+          _fila.length > 1 && (_fila.codeUnitAt(0) & 0xFC00) == 0xD800 ? 2 : 1;
+      final letra = _fila.substring(0, tamanho);
+      _fila = _fila.substring(tamanho);
+      // Respira um pouco na pontuação, como quem fala.
+      _pausa = switch (letra) {
+        '.' || '!' || '?' => 7,
+        ',' || ';' || ':' => 3,
+        _ => 0,
+      };
+      setState(() {
+        resposta.texto += letra;
+        _falando = true;
+        _humor = Humor.esperando;
+      });
+      _rolarParaOFim();
+    });
+    return pronto.future;
   }
 
   void _rolarParaOFim() {
@@ -53,15 +137,8 @@ class _ConversaTelaState extends State<ConversaTela> {
     if (texto.isEmpty || _respondendo) return;
     _campo.clear();
 
-    final ajustes = context.read<Ajustes>();
-    final gemma = ConversaGemma(
-      endereco: ajustes.enderecoOllama,
-      modelo: ajustes.modelo,
-    );
-    final instrucoes = ConversaGemma.instrucoes(
-      'Frost',
-      context.read<EstadoCodice>().memorias,
-    );
+    final gemma = _gemma();
+    final instrucoes = _instrucoes();
     final historico = [..._mensagens, Mensagem.daPessoa(texto)];
     final resposta = Mensagem.daNavi('');
 
@@ -74,19 +151,26 @@ class _ConversaTelaState extends State<ConversaTela> {
     });
     _rolarParaOFim();
 
+    _fila = '';
+    var recebeuTudo = false;
+    final falando = _falarAos(resposta, () => recebeuTudo);
     try {
       await for (final pedaco in gemma.responder(instrucoes, historico)) {
         if (!mounted) return;
-        setState(() {
-          resposta.texto += pedaco;
-          _falando = true;
-          _humor = Humor.esperando;
-        });
-        _rolarParaOFim();
+        // O gemma3:1b às vezes ignora o "sem emojis" do prompt.
+        final limpo = pedaco.replaceAll(_emoji, '');
+        // O começo da resposta costuma vir com espaços ou quebra de linha.
+        _fila += resposta.texto.isEmpty && _fila.isEmpty
+            ? limpo.trimLeft()
+            : limpo;
       }
+      recebeuTudo = true;
+      await falando;
       resposta.texto = resposta.texto.trim();
       _humor = resposta.texto.endsWith('?') ? Humor.curiosa : Humor.feliz;
     } on ErroGemma catch (erro) {
+      _relogio?.cancel();
+      _fila = '';
       _mensagens.remove(resposta);
       _humor = Humor.confusa;
       if (mounted) avisar(context, '$erro', icone: Icons.wifi_off);
@@ -102,6 +186,7 @@ class _ConversaTelaState extends State<ConversaTela> {
   @override
   Widget build(BuildContext context) {
     final modelo = context.watch<Ajustes>().modelo;
+    final cor = context.watch<Sessao>().perfil.elemento.cor;
     return Column(
       children: [
         const Padding(
@@ -113,11 +198,41 @@ class _ConversaTelaState extends State<ConversaTela> {
           height: 200,
           child: Stack(
             children: [
+              // Brilho na cor do elemento, atrás dela.
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, 0.2),
+                      radius: 0.7,
+                      colors: [cor.withValues(alpha: 0.16), Colors.transparent],
+                    ),
+                  ),
+                ),
+              ),
               Positioned.fill(
                 child: AvatarNavi(
                   enquadramento: Enquadramento.busto,
                   humor: _humor,
                   falando: _falando,
+                ),
+              ),
+              // O busto some aos poucos em vez de terminar num corte reto.
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 46,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x000E0D15), Cores.fundo],
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Positioned(
@@ -148,9 +263,12 @@ class _ConversaTelaState extends State<ConversaTela> {
           ),
         ),
         if (_respondendo && _mensagens.last.texto.isEmpty)
-          const Padding(
-            padding: EdgeInsets.only(bottom: 6),
-            child: Text('a Frost está pensando...', style: Estilos.legenda),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              '${context.watch<Sessao>().perfil.nome} está pensando...',
+              style: Estilos.legenda,
+            ),
           ),
         CampoMensagem(
           controle: _campo,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
@@ -48,12 +50,25 @@ class MenuLateral extends StatelessWidget {
     );
   }
 
-  /// pushReplacement: depois de sair, o voltar não retorna para o app.
-  void _sair(BuildContext context) =>
-      Navigator.of(context).pushReplacementNamed(Rotas.inicio);
+  /// Sai da conta (se houver) e volta para a entrada. pushReplacement:
+  /// depois de sair, o voltar não retorna para o app.
+  Future<void> _sair(BuildContext context) async {
+    final navegador = Navigator.of(context);
+    final sessao = context.read<Sessao>();
+    if (sessao.conectado) {
+      try {
+        await sessao.sair();
+      } catch (_) {
+        // Mesmo sem apagar do armazenamento, a sessão some desta tela.
+      }
+    }
+    navegador.pushReplacementNamed(Rotas.inicio);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final sessao = context.watch<Sessao>();
+    final perfil = sessao.perfil;
     return Drawer(
       child: SafeArea(
         child: Column(
@@ -66,7 +81,7 @@ class MenuLateral extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Cores.turquesa),
+                      border: Border.all(color: perfil.elemento.cor),
                     ),
                     child: const AvatarNavi(
                       largura: 52,
@@ -75,22 +90,36 @@ class MenuLateral extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Frost', style: Estilos.tituloDialogo),
-                      SizedBox(height: 2),
-                      Text(
-                        'NAVI · 8 anos · criança',
-                        style: TextStyle(color: Cores.roxoClaro, fontSize: 10),
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          perfil.nome,
+                          style: Estilos.tituloDialogo,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${perfil.elemento.titulo} · 8 anos · criança',
+                          style: TextStyle(color: perfil.elemento.cor, fontSize: 10),
+                        ),
+                        if (sessao.usuario != null)
+                          Text('@${sessao.usuario}', style: Estilos.legenda),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             const Divider(height: 1),
             const SizedBox(height: 8),
+            _Item(
+              icone: Icons.psychology_outlined,
+              titulo: 'Personalidade',
+              subtitulo: 'nome, elemento e jeito de ser',
+              onTap: () => _abrir(context, Rotas.perfil),
+            ),
             _Item(
               icone: Icons.view_in_ar_outlined,
               titulo: 'Importar NAVI',
@@ -113,8 +142,10 @@ class MenuLateral extends StatelessWidget {
             const Divider(height: 1),
             _Item(
               icone: Icons.logout,
-              titulo: 'Sair',
-              subtitulo: 'voltar para a tela de entrada',
+              titulo: sessao.conectado ? 'Sair da conta' : 'Sair',
+              subtitulo: sessao.conectado
+                  ? 'esquece a sessão neste aparelho'
+                  : 'voltar para a tela de entrada',
               cor: Cores.vermelho,
               onTap: () => _sair(context),
             ),

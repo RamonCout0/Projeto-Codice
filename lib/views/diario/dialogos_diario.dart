@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/models/memoria.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
@@ -124,7 +126,7 @@ void mostrarMemorias(BuildContext context, List<Memoria> memorias) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'o que a Frost sabe (${memorias.length})',
+            'o que ${ctx.read<Sessao>().perfil.nome} sabe (${memorias.length})',
             style: Estilos.tituloDialogo,
           ),
           const SizedBox(height: 2),

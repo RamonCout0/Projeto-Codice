@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/models/humor.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/views/diario/humor_visual.dart';
@@ -58,7 +60,7 @@ class NaviQueLe extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            Expanded(child: _balao()),
+            Expanded(child: _balao(context)),
           ],
         ),
         const SizedBox(height: 8),
@@ -82,7 +84,7 @@ class NaviQueLe extends StatelessWidget {
     );
   }
 
-  Widget _balao() {
+  Widget _balao(BuildContext context) {
     const raio = Radius.circular(15);
     return Painel(
       borda: humor.cor,
@@ -99,8 +101,8 @@ class NaviQueLe extends StatelessWidget {
             children: [
               Icon(humor.icone, color: humor.cor, size: 12),
               const SizedBox(width: 5),
-              const Text(
-                'Frost · 8 anos',
+              Text(
+                '${context.watch<Sessao>().perfil.nome} · 8 anos',
                 style: TextStyle(
                   color: Cores.textoSecundario,
                   fontSize: 9,

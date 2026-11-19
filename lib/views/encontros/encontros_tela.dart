@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
 import 'package:codice_app/controllers/estado_codice.dart';
+import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/cartao_lista.dart';
 
@@ -16,18 +18,33 @@ class EncontrosTela extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const CabecalhoAba('Encontros'),
-        const TituloGrande(
+        TituloGrande(
           'Encontros',
-          subtitulo: 'NAVIs que a Frost conheceu por perto',
+          subtitulo:
+              'NAVIs que ${context.watch<Sessao>().perfil.nome} conheceu por perto',
         ),
         const SizedBox(height: 14),
         Expanded(
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            itemCount: navis.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 8),
+            itemCount: navis.length + 1,
+            separatorBuilder: (_, i) => SizedBox(height: i == 0 ? 16 : 8),
             itemBuilder: (context, i) {
-              final navi = navis[i];
+              if (i == 0) {
+                final media = navis.isEmpty
+                    ? 0
+                    : navis.map((n) => n.afinidade).reduce((a, b) => a + b) ~/
+                          navis.length;
+                return CartaoDestaque(
+                  icone: Icons.bluetooth_searching,
+                  cor: Cores.rosa,
+                  titulo: '${navis.length} NAVIs encontrados',
+                  texto: 'afinidade média de $media%. Toque em um para dar '
+                      'um apelido.',
+                  progresso: media / 100,
+                );
+              }
+              final navi = navis[i - 1];
               return CartaoLista(
                 icone: Icons.smart_toy_outlined,
                 corIcone: navi.cor,

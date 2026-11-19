@@ -6,6 +6,7 @@ import 'package:codice_app/services/navi_3d/arquivos_navi.dart';
 /// Servidor HTTP só dentro do aparelho (127.0.0.1) que entrega o
 /// visualizador 3D para a WebView. Abrir os arquivos direto com file://
 /// não funciona: a WebView bloqueia o carregamento do modelo.
+/// (Na web o visualizador roda num iframe e não precisa deste servidor.)
 class ServidorNavi {
   ServidorNavi._();
 
@@ -40,22 +41,23 @@ class ServidorNavi {
           'text/javascript; charset=utf-8',
         );
       } else if (caminho == '/modelo.vrm' && arquivos.modelo != null) {
-        await _arquivo(resposta, arquivos.modelo!);
+        await _fonte(resposta, arquivos.modelo!);
       } else if (caminho == '/animacoes.json') {
+        // A extensão diz ao visualizador como ler: .vrma ou .fbx (Mixamo).
         final lista = {
-          for (final g in arquivos.animacoes.keys)
-            g.name: '/anim/${g.name}.vrma',
+          for (final MapEntry(key: g, value: f) in arquivos.animacoes.entries)
+            g.name: '/anim/${g.name}.${f.extensao}',
         };
         resposta.headers.contentType = ContentType.json;
         resposta.write(jsonEncode(lista));
       } else if (caminho.startsWith('/anim/')) {
-        final nome = caminho.substring(6).replaceAll('.vrma', '');
+        final nome = caminho.substring(6).split('.').first;
         final gesto = Gesto.values.where((g) => g.name == nome).firstOrNull;
-        final arquivo = gesto == null ? null : arquivos.animacoes[gesto];
-        if (arquivo == null) {
+        final fonte = gesto == null ? null : arquivos.animacoes[gesto];
+        if (fonte == null) {
           resposta.statusCode = HttpStatus.notFound;
         } else {
-          await _arquivo(resposta, arquivo);
+          await _fonte(resposta, fonte);
         }
       } else {
         resposta.statusCode = HttpStatus.notFound;
@@ -72,9 +74,17 @@ class ServidorNavi {
     r.add(dados.buffer.asUint8List(dados.offsetInBytes, dados.lengthInBytes));
   }
 
-  static Future<void> _arquivo(HttpResponse r, File arquivo) async {
+  static Future<void> _fonte(HttpResponse r, FonteNavi fonte) async {
     r.headers.contentType = ContentType.binary;
-    r.headers.contentLength = await arquivo.length();
-    await r.addStream(arquivo.openRead());
+    switch (fonte) {
+      case FonteArquivo(:final arquivo):
+        r.headers.contentLength = await arquivo.length();
+        await r.addStream(arquivo.openRead());
+      case FonteBytes(:final bytes):
+        r.add(bytes);
+      case FonteAsset(:final chave):
+        final dados = await rootBundle.load(chave);
+        r.add(dados.buffer.asUint8List(dados.offsetInBytes, dados.lengthInBytes));
+    }
   }
 }

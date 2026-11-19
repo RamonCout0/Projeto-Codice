@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
 import 'package:codice_app/controllers/estado_codice.dart';
@@ -23,7 +24,8 @@ class DetalheNaviTela extends StatelessWidget {
     );
     if (!context.mounted || novo == null || novo.isEmpty) return;
     context.read<EstadoCodice>().alterarApelido(atual.nome, novo);
-    avisar(context, 'a Frost agora chama ${atual.nome} de "$novo"');
+    final nome = context.read<Sessao>().perfil.nome;
+    avisar(context, '$nome agora chama ${atual.nome} de "$novo"');
   }
 
   @override
@@ -58,7 +60,10 @@ class DetalheNaviTela extends StatelessWidget {
                   altura: 6,
                 ),
                 const SizedBox(height: 16),
-                Text('«${atual.relato}»', style: Estilos.corpoSuave),
+                Text(
+                  '«${atual.relato.replaceAll('Frost', context.watch<Sessao>().perfil.nome)}»',
+                  style: Estilos.corpoSuave,
+                ),
                 const SizedBox(height: 22),
                 ElevatedButton.icon(
                   onPressed: () => _darApelido(context, atual),

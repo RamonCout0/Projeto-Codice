@@ -59,6 +59,20 @@ void main() {
     final texto = File('${pasta.path}/c.txt')
       ..writeAsStringSync('oi, não sou glb');
     expect(await lerGlb(texto), isNull);
+    expect(await ehFbx(texto), isFalse);
+  });
+
+  test('reconhece .fbx do Mixamo, binário e texto', () async {
+    final pasta = Directory.systemTemp.createTempSync('codice');
+    addTearDown(() => pasta.deleteSync(recursive: true));
+
+    final binario = File('${pasta.path}/aceno.fbx')
+      ..writeAsBytesSync([...'Kaydara FBX Binary  '.codeUnits, 0, 0x1a, 0]);
+    final texto = File('${pasta.path}/parada.fbx')
+      ..writeAsStringSync('; FBX 7.4.0 project file\n');
+    expect(await ehFbx(binario), isTrue);
+    expect(await ehFbx(texto), isTrue);
+    expect(await lerGlb(binario), isNull);
   });
 
   test('junta os pedaços da resposta do Ollama e manda o histórico', () async {

@@ -12,7 +12,7 @@ android {
     }
     defaultConfig {
         applicationId = "br.edu.ifrn.codice"
-        minSdk = flutter.minSdkVersion
+        minSdk = maxOf(23, flutter.minSdkVersion) // flutter_secure_storage
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

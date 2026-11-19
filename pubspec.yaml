@@ -9,9 +9,11 @@ dependencies:
   file_picker: ^13.3.3
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^10.0.0
   http: ^1.6.0
   path_provider: ^2.1.6
   provider: ^6.1.5
+  web: ^1.1.1
   webview_flutter: ^4.14.1
 dev_dependencies:
   flutter_test:
@@ -20,3 +22,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/navis/
+    - assets/navi_3d/
+    # Modelo e animações da apresentação (fora do Git). Veja o LEIA-ME de lá.
+    - assets/navi_local/

@@ -13,7 +13,11 @@ abstract final class Estilos {
     fontSize: 16,
     fontWeight: FontWeight.bold,
   );
-  static const cabecalho = TextStyle(color: Color(0xFF8D8996), fontSize: 14);
+  static const cabecalho = TextStyle(
+    color: Cores.textoSecundario,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
   static const corpo = TextStyle(color: Cores.texto, fontSize: 12, height: 1.4);
   static const corpoSuave = TextStyle(
     color: Cores.textoSuave,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/models/lugar.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
@@ -22,7 +24,11 @@ class LugarTela extends StatelessWidget {
           TituloGrande(lugar.nome, subtitulo: lugar.comoRevelou),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-            child: Text(lugar.descricao, style: Estilos.corpoSuave),
+            child: Text(
+              // Os textos de demonstração foram escritos para a Frost.
+              lugar.descricao.replaceAll('Frost', context.watch<Sessao>().perfil.nome),
+              style: Estilos.corpoSuave,
+            ),
           ),
         ],
       ),

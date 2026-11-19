@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/sessao.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
@@ -100,7 +102,8 @@ class CampoMensagem extends StatelessWidget {
               textCapitalization: TextCapitalization.sentences,
               onSubmitted: (_) => aoEnviar(),
               decoration: InputDecoration(
-                hintText: 'escrever para a Frost...',
+                hintText:
+                    'escrever para ${context.watch<Sessao>().perfil.nome}...',
                 hintStyle: const TextStyle(color: Color(0xFF898394)),
                 filled: true,
                 fillColor: const Color(0xFF171620),

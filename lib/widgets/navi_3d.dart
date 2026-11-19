@@ -1,19 +1,17 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:codice_app/models/humor.dart';
 import 'package:codice_app/services/navi_3d/arquivos_navi.dart';
-import 'package:codice_app/services/navi_3d/servidor_navi.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/widgets/navi_3d/visualizador.dart';
 
 enum Enquadramento3D { corpo, busto }
 
-/// A NAVI em 3D, animada. Por dentro é uma WebView rodando three.js +
-/// three-vrm (veja navi_3d/src). Só existe no Android e no iOS e só
-/// quando um modelo foi importado; fora disso o [AvatarNavi] usa a imagem.
+/// A NAVI em 3D, animada. Por dentro é uma página three.js + three-vrm
+/// (veja navi_3d/src): WebView no celular e iframe na web. Só aparece
+/// quando há um modelo (importado ou em assets/navi_local); fora disso o
+/// [AvatarNavi] usa a imagem.
 class Navi3D extends StatefulWidget {
   final Enquadramento3D enquadramento;
   final Humor humor;
@@ -30,8 +28,7 @@ class Navi3D extends StatefulWidget {
     this.falando = false,
   });
 
-  static bool get suportado =>
-      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  static bool get suportado => Visualizador.suportado;
 
   @override
   State<Navi3D> createState() => _Navi3DState();
@@ -39,8 +36,9 @@ class Navi3D extends StatefulWidget {
 
 class _Navi3DState extends State<Navi3D> {
   late final ArquivosNavi _arquivos = context.read<ArquivosNavi>();
-  WebViewController? _controle;
+  late final Visualizador _visualizador = Visualizador(_aoReceber);
   int _versaoCarregada = -1;
+  FonteNavi? _modeloCarregado;
   bool _pronto = false;
   double _progresso = 0;
   bool _visivel = true;
@@ -55,39 +53,36 @@ class _Navi3DState extends State<Navi3D> {
   @override
   void dispose() {
     _arquivos.removeListener(_aoMudarArquivos);
+    _visualizador.descartar();
     super.dispose();
   }
 
   void _aoMudarArquivos() {
-    if (_arquivos.versao != _versaoCarregada) _carregar();
+    if (_arquivos.versao != _versaoCarregada ||
+        _arquivos.modelo != _modeloCarregado) {
+      _carregar();
+    }
   }
 
   Future<void> _carregar() async {
     _versaoCarregada = _arquivos.versao;
+    _modeloCarregado = _arquivos.modelo;
     setState(() {
       _pronto = false;
       _progresso = 0;
     });
     if (_arquivos.modelo == null) return;
 
-    final base = await ServidorNavi.endereco(_arquivos);
-    final endereco = base.replace(
-      queryParameters: {
-        'enquadramento': widget.enquadramento.name,
-        if (_arquivos.retrato == null) 'retrato': '1',
-        'v': '$_versaoCarregada', // evita o cache do modelo anterior
-      },
-    );
-    final controle = _controle ??= WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.transparent)
-      ..addJavaScriptChannel('Navi', onMessageReceived: _aoReceber);
-    await controle.loadRequest(endereco);
+    await _visualizador.abrir(_arquivos, {
+      'enquadramento': widget.enquadramento.name,
+      if (_arquivos.retrato == null) 'retrato': '1',
+      'v': '$_versaoCarregada', // evita o cache do modelo anterior
+    });
     if (mounted) setState(() {});
   }
 
-  void _aoReceber(JavaScriptMessage mensagem) {
-    final dados = jsonDecode(mensagem.message) as Map<String, dynamic>;
+  void _aoReceber(Map<String, dynamic> dados) {
+    if (!mounted) return;
     switch (dados['tipo']) {
       case 'progresso':
         setState(() => _progresso = (dados['valor'] as num).toDouble());
@@ -101,20 +96,22 @@ class _Navi3DState extends State<Navi3D> {
     }
   }
 
-  void _js(String codigo) => _controle?.runJavaScript('window.navi?.$codigo');
-
   void _enviarEstado() {
-    _js("humor('${widget.humor.name}')");
-    _js('falar(${widget.falando})');
-    _js('pausar(${!_visivel})');
+    _visualizador.comando('humor', widget.humor.name);
+    _visualizador.comando('falar', widget.falando);
+    _visualizador.comando('pausar', !_visivel);
   }
 
   @override
   void didUpdateWidget(Navi3D antigo) {
     super.didUpdateWidget(antigo);
     if (!_pronto) return;
-    if (antigo.humor != widget.humor) _js("humor('${widget.humor.name}')");
-    if (antigo.falando != widget.falando) _js('falar(${widget.falando})');
+    if (antigo.humor != widget.humor) {
+      _visualizador.comando('humor', widget.humor.name);
+    }
+    if (antigo.falando != widget.falando) {
+      _visualizador.comando('falar', widget.falando);
+    }
   }
 
   /// Aba escondida no IndexedStack: para de desenhar e poupa bateria.
@@ -124,23 +121,28 @@ class _Navi3DState extends State<Navi3D> {
     final visivel = Visibility.of(context);
     if (visivel == _visivel) return;
     _visivel = visivel;
-    if (_pronto) _js('pausar(${!visivel})');
+    if (_pronto) _visualizador.comando('pausar', !visivel);
   }
 
   @override
   Widget build(BuildContext context) {
-    final controle = _controle;
+    final temModelo = _arquivos.modelo != null;
     return Stack(
       fit: StackFit.expand,
       children: [
-        if (!_pronto) widget.reserva,
-        if (controle != null && _arquivos.modelo != null)
-          AnimatedOpacity(
-            opacity: _pronto ? 1 : 0,
+        // O visualizador fica sempre desenhado (com opacidade 0 o Flutter
+        // nem coloca o iframe/WebView na tela, e ele nunca carregaria).
+        // A imagem de reserva fica por cima e some quando a NAVI fica pronta.
+        if (temModelo) _visualizador.construir(),
+        IgnorePointer(
+          ignoring: _pronto,
+          child: AnimatedOpacity(
+            opacity: _pronto ? 0 : 1,
             duration: const Duration(milliseconds: 400),
-            child: WebViewWidget(controller: controle),
+            child: widget.reserva,
           ),
-        if (!_pronto && _arquivos.modelo != null)
+        ),
+        if (!_pronto && temModelo)
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:codice_app/app/rotas.dart';
+import 'package:codice_app/controllers/sessao.dart';
+import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
+import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/menu.dart';
 
-/// Linha do topo das abas: botão do menu + nome da aba.
+/// Linha do topo das abas: menu, nome da aba e o retrato do NAVI (que abre
+/// a personalidade).
 class CabecalhoAba extends StatelessWidget {
   final String titulo;
 
@@ -10,12 +16,40 @@ class CabecalhoAba extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cor = context.watch<Sessao>().perfil.elemento.cor;
     return SizedBox(
-      height: 40,
+      height: 48,
       child: Row(
         children: [
           const BotaoMenu(),
-          Text(titulo, style: Estilos.cabecalho),
+          Expanded(
+            child: Text(
+              titulo,
+              overflow: TextOverflow.ellipsis,
+              style: Estilos.cabecalho,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Tooltip(
+              message: 'personalidade do NAVI',
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed(Rotas.perfil),
+                child: Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: cor.withValues(alpha: 0.8)),
+                  ),
+                  child: const AvatarNavi(largura: 28, altura: 28, redondo: true),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -31,7 +65,7 @@ class CabecalhoDetalhe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: 48,
       child: Row(
         children: [
           IconButton(
@@ -61,14 +95,17 @@ class TituloGrande extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(texto, style: Estilos.titulo),
           if (subtitulo != null) ...[
-            const SizedBox(height: 3),
-            Text(subtitulo!, style: Estilos.legenda),
+            const SizedBox(height: 4),
+            Text(
+              subtitulo!,
+              style: Estilos.legenda.copyWith(fontSize: 11, color: Cores.textoSecundario),
+            ),
           ],
         ],
       ),

@@ -10,9 +10,19 @@ android/key.properties
 android/app/src/main/java/
 android/.kotlin/
 
+# Segredos e contas da API de comunicação segura.
+api/dados/
+.env
+.env.*
+*.pem
+*.key
+
 # Modelos e animações têm licença própria: ficam só no aparelho.
 *.vrm
 *.vrma
+*.fbx
+assets/navi_local/*
+!assets/navi_local/LEIA-ME.md
 
 # Configuração local do Claude Code.
 .claude/

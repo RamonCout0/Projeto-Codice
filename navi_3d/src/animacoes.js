@@ -18,6 +18,7 @@ const HUMORES = {
 const NOMES_EXPRESSAO = ['happy', 'sad', 'relaxed', 'surprised', 'angry'];
 const VOGAIS = ['aa', 'ih', 'ou', 'ee', 'oh'];
 const ACENO_PROCEDURAL = 2.2; // segundos
+const INTERVALO_ACENO = 8; // segundos sem acenar de novo, mesmo com toques
 
 const suavizar = (atual, alvo, velocidade, delta) =>
   atual + (alvo - atual) * (1 - Math.exp(-velocidade * delta));
@@ -55,6 +56,7 @@ export function criarAnimador(vrm, clipes = {}) {
   let proximaSilaba = 0;
   let acenoProcedural = -1;
   let gestoAtual = null;
+  let proximoAceno = 0;
 
   // Volta para a "parada" quando um gesto pronto termina.
   mixer.addEventListener('finished', (e) => {
@@ -159,6 +161,9 @@ export function criarAnimador(vrm, clipes = {}) {
       falando = sim;
     },
     acenar() {
+      // Vários toques seguidos não viram vários acenos.
+      if (t < proximoAceno) return;
+      proximoAceno = t + INTERVALO_ACENO;
       if (!tocarGesto('aceno') && acenoProcedural < 0 && !acoes.parada) acenoProcedural = 0;
     },
   };

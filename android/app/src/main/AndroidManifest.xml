@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Conversa com o Ollama no PC e visualizador 3D servido em 127.0.0.1. -->
+    <!-- Conversa com o Ollama no PC e visualizador 3D servido em 127.0.0.1.
+         A API de login só aceita HTTPS (o app recusa outro esquema).
+         allowBackup=false: o token do armazenamento seguro não vai para backups. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <application android:label="Códice" android:name="${applicationName}" android:usesCleartextTraffic="true">
+    <application android:label="Códice" android:name="${applicationName}" android:allowBackup="false" android:usesCleartextTraffic="true">
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@android:style/Theme.Black.NoTitleBar" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@android:style/Theme.Black.NoTitleBar" />
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>

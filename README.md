@@ -113,8 +113,11 @@ VRoid). O modelo é importado no próprio celular: **Menu → Importar NAVI**
 e-mail e escolha o arquivo. Nenhum `.vrm` vai para o repositório, porque cada
 modelo tem a sua licença (a Alice, por exemplo, não permite redistribuir).
 
-Na mesma tela dá para importar **animações prontas (.vrma)**, como as do
-VRoid Motion Pack, em três momentos:
+Na mesma tela dá para importar **animações prontas**, em três momentos. Vale
+`.vrma` (como as do VRoid Motion Pack) ou `.fbx` do **Mixamo**: o visualizador
+converte o esqueleto do Mixamo para o do VRM sozinho (`navi_3d/src/mixamo.js`).
+No [mixamo.com](https://www.mixamo.com), baixe em **FBX Binary (.fbx)**, com
+**Without Skin**. Os arquivos também ficam só no aparelho.
 
 | Animação | Quando toca |
 | --- | --- |
@@ -122,11 +125,18 @@ VRoid Motion Pack, em três momentos:
 | Aceno | quando você toca na NAVI |
 | Comemorar | quando ela fica feliz |
 
-Sem os `.vrma`, a NAVI usa movimentos simples feitos pelo próprio app
+Sem animações importadas, a NAVI usa movimentos simples feitos pelo próprio app
 (respirar, balançar e acenar). Por cima de qualquer animação, o app controla
 o rosto: pisca, muda a expressão conforme o humor e mexe a boca enquanto o
 Gemma responde. A foto pequena da NAVI (Diário, Conversa, menu) é tirada do
 próprio modelo depois que ele carrega.
+
+O 3D funciona no Android, no iOS e na web (`flutter run -d edge`). Na web,
+o que é importado pela tela vale só até fechar a aba, e o `flutter run -d edge`
+abre um navegador limpo a cada execução. Para apresentar, coloque os arquivos em
+[assets/navi_local/](assets/navi_local/LEIA-ME.md) (`modelo.vrm`,
+`parada.fbx`, `aceno.fbx`, `comemorar.fbx`): o app carrega tudo sozinho, na web
+e no celular, e a pasta fica fora do Git.
 
 O 3D roda numa WebView com [three.js](https://threejs.org) e
 [three-vrm](https://github.com/pixiv/three-vrm). O código fica em `navi_3d/`
@@ -138,7 +148,8 @@ npm install
 npm run build
 ```
 
-No PC (Windows) o 3D não aparece: o app usa a imagem da Frost.
+No app de desktop do Windows o 3D não aparece. Sem modelo, a NAVI fica vazia
+até você importar um `.vrm` (o app não traz imagem pronta).
 
 ## Organização do código
 
@@ -168,3 +179,19 @@ Desenvolvido para a disciplina de Desenvolvimento para Dispositivos Móveis por
 **Referências:** Pokémon GO, Mega Man NT Warrior, POU e Waze.
 
 Link do Figma:https://www.figma.com/design/Do7j79OBvSKrucbwdNoc1S/C%C3%B3dice?node-id=0-1&t=tFKnwnIfS7nye4Rc-1
+
+## Comunicação segura
+
+Cadastro e login no próprio app, JWT guardado com segurança e consulta
+protegida de NAVIs. Para usar no PC, rode a API antes (`node api/servidor.mjs`,
+sem configurar nada). Na tela inicial, **criar meu NAVI** abre o cadastro e
+**já tenho um códice** abre o login. Os dois têm **entrar sem conta**.
+
+- [Atividade de comunicação segura](COMUNICACAO_SEGURA.md)
+- [Relatório da atividade](Relatorio_Comunicacao_Segura.pdf)
+- API de exemplo: [api/servidor.mjs](api/servidor.mjs)
+
+## Além das atividades
+
+Conversa com IA local, NAVI em 3D, animações do Mixamo e 3D na web:
+[ALEM_DAS_ATIVIDADES.md](ALEM_DAS_ATIVIDADES.md).

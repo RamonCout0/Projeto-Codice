@@ -40,24 +40,24 @@ class PalcoNavi extends StatelessWidget {
               ),
             ),
           ),
-          // Brilho no chão.
+          // Brilho no chão: um círculo de luz achatado, com bordas suaves.
           Positioned(
             left: 0,
             right: 0,
-            bottom: 12,
+            bottom: 6,
             child: Center(
-              child: Container(
-                width: 160,
-                height: 14,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.elliptical(80, 7)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: cor.withValues(alpha: 0.55),
-                      blurRadius: 26,
-                      spreadRadius: 3,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.diagonal3Values(1, 0.16, 1),
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [cor.withValues(alpha: 0.5), cor.withValues(alpha: 0)],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

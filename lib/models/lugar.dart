@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:codice_app/services/api_navicity.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Um lugar da NAVICity, como a cidade o descreve agora.
 class Lugar {
@@ -29,11 +29,11 @@ class Lugar {
     voce: a.voce,
   );
 
-  IconData get icone => switch (tipo) {
-    'praca' => Icons.graphic_eq,
-    'biblioteca' => Icons.local_library_outlined,
-    'cafe' => Icons.local_cafe_outlined,
-    _ => Icons.place_outlined,
+  Ic get icone => switch (tipo) {
+    'praca' => Ic.praca,
+    'biblioteca' => Ic.biblioteca,
+    'cafe' => Ic.cafe,
+    _ => Ic.lugar,
   };
 
   /// Resumo do que acontece aqui agora, tirado dos números da cidade.

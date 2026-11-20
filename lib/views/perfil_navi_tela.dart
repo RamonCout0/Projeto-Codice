@@ -9,6 +9,7 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Nome, elemento, traços e gostos do NAVI. É daqui que o Gemma tira a
 /// personalidade que interpreta na Conversa.
@@ -50,7 +51,7 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
   Future<void> _salvar() async {
     final nome = _nome.text.trim();
     if (nome.isEmpty) {
-      avisar(context, 'dê um nome ao seu NAVI', icone: Icons.edit_outlined);
+      avisar(context, 'dê um nome ao seu NAVI', icone: Ic.editar);
       return;
     }
     final perfil = _perfil.copiar(
@@ -68,7 +69,7 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
         Navigator.of(context).pop();
       }
     } on FalhaApi catch (falha) {
-      if (mounted) avisar(context, falha.mensagem, icone: Icons.error_outline);
+      if (mounted) avisar(context, falha.mensagem, icone: Ic.erro);
     } finally {
       if (mounted) setState(() => _salvando = false);
     }
@@ -94,9 +95,10 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                   TituloGrande(
                     widget.criando ? 'Crie seu NAVI' : 'Personalidade',
                     subtitulo: 'é assim que o seu NAVI pensa e fala com você.',
+                    padding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 18),
-                  const Text('NOME', style: Estilos.secao),
+                  Text('NOME', style: Estilos.secao),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _nome,
@@ -105,12 +107,12 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                     decoration: const InputDecoration(
                       hintText: 'como seu NAVI se chama',
                       counterText: '',
-                      prefixIcon: Icon(Icons.badge_outlined, size: 18),
+                      prefixIcon: IconeCodice(Ic.cracha, size: 18),
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
                   const SizedBox(height: 20),
-                  const Text('ELEMENTO', style: Estilos.secao),
+                  Text('ELEMENTO', style: Estilos.secao),
                   const SizedBox(height: 8),
                   GridView.count(
                     crossAxisCount: 4,
@@ -137,7 +139,7 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Text('PERSONALIDADE', style: Estilos.secao),
+                      Text('PERSONALIDADE', style: Estilos.secao),
                       const Spacer(),
                       Text(
                         '${_perfil.tracos.length} de ${PerfilNavi.maxTracos}',
@@ -160,14 +162,14 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Text('DO QUE GOSTA', style: Estilos.secao),
+                  Text('DO QUE GOSTA', style: Estilos.secao),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _gostos,
                     maxLength: PerfilNavi.maxGostos,
                     decoration: const InputDecoration(
                       hintText: 'ex.: livros de aventura, chuva, gatos',
-                      prefixIcon: Icon(Icons.favorite_border, size: 18),
+                      prefixIcon: IconeCodice(Ic.coracao, size: 18),
                     ),
                     onChanged: (_) => setState(() {}),
                   ),
@@ -180,7 +182,7 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                   ),
                   if (!_sessao.conectado) ...[
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       'sem conta, a personalidade fica só neste aparelho.',
                       style: Estilos.legenda,
                     ),
@@ -202,7 +204,7 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                         dimension: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Icon(elemento.icone, size: 18),
+                    : IconeCodice(elemento.icone, size: 18),
                 label: Text(widget.criando ? 'criar meu NAVI' : 'salvar'),
               ),
             ),
@@ -247,12 +249,12 @@ class _CartaoElemento extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(elemento.icone, color: escolhido ? cor : Cores.textoApagado, size: 22),
+              IconeCodice(elemento.icone, color: escolhido ? cor : Cores.textoApagado, size: 22),
               const SizedBox(height: 6),
               Text(
                 elemento.titulo,
                 style: TextStyle(
-                  color: escolhido ? Colors.white : Cores.textoSecundario,
+                  color: escolhido ? Cores.texto : Cores.textoSecundario,
                   fontSize: 12,
                   fontWeight: escolhido ? FontWeight.bold : FontWeight.normal,
                 ),
@@ -279,9 +281,9 @@ class _Previa extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.psychology_outlined, size: 16, color: perfil.elemento.cor),
+              IconeCodice(Ic.navi, size: 16, color: perfil.elemento.cor),
               const SizedBox(width: 6),
-              const Text('COMO O GEMMA VAI INTERPRETAR', style: Estilos.secao),
+              Text('COMO O GEMMA VAI INTERPRETAR', style: Estilos.secao),
             ],
           ),
           const SizedBox(height: 8),

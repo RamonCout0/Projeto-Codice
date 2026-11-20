@@ -8,6 +8,8 @@ import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/cartao_lista.dart';
 import 'package:codice_app/widgets/estado_cidade.dart';
+import 'package:codice_app/widgets/foto_navi.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 class EncontrosTela extends StatelessWidget {
   const EncontrosTela({super.key});
@@ -41,8 +43,8 @@ class EncontrosTela extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 12),
                     child: Column(
                       children: [
-                        const Icon(
-                          Icons.people_outline_rounded,
+                        IconeCodice(
+                          Ic.pessoas,
                           size: 44,
                           color: Cores.textoFraco,
                         ),
@@ -60,7 +62,7 @@ class EncontrosTela extends StatelessWidget {
                   )
                 else ...[
                   CartaoDestaque(
-                    icone: Icons.people_outline_rounded,
+                    icone: Ic.pessoas,
                     cor: Cores.rosa,
                     titulo:
                         '${navis.length} ${navis.length == 1 ? 'NAVI conhecido' : 'NAVIs conhecidos'}',
@@ -70,12 +72,9 @@ class EncontrosTela extends StatelessWidget {
                   const SizedBox(height: 16),
                   for (final navi in navis) ...[
                     CartaoLista(
-                      icone: navi.gm ? Icons.memory : Icons.smart_toy_outlined,
-                      corIcone: navi.cor,
-                      titulo: [
-                        navi.apelido == null ? navi.nome : '${navi.apelido}  (${navi.nome})',
-                        if (navi.gm) '· GM',
-                      ].join(' '),
+                      icone: Ic.navi,
+                      lider: FotoNavi(cor: navi.cor, gm: navi.gm, tamanho: 52),
+                      titulo: navi.apelido == null ? navi.nome : '${navi.apelido}  (${navi.nome})',
                       subtitulo: '${navi.quando} · ${navi.ultimaArea} · afinidade ${navi.afinidade}%',
                       onTap: () => Navigator.pushNamed(
                         context,

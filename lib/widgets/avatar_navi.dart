@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:codice_app/app/rotas.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/models/humor.dart';
 import 'package:codice_app/services/navi_3d/arquivos_navi.dart';
-import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/widgets/navi_3d.dart';
+import 'package:codice_app/widgets/navi_vetor.dart';
 
 enum Enquadramento { corpo, busto, rosto }
 
 /// O único lugar do app que desenha a NAVI.
 /// - corpo/busto: o modelo 3D animado (importado ou em assets/navi_local);
 /// - rosto: a foto tirada do próprio modelo depois que ele carrega.
-/// Sem modelo, fica um espaço vazio convidando a importar um.
+/// Sem modelo 3D (ou onde o 3D não roda), mostra a NAVI vetorial do projeto,
+/// com o humor e as cores do elemento.
 class AvatarNavi extends StatelessWidget {
   final Enquadramento enquadramento;
   final double? largura;
@@ -37,6 +38,7 @@ class AvatarNavi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final arquivos = context.watch<ArquivosNavi>();
+    final cor = context.watch<Sessao>().perfil.elemento.cor;
     final rosto = enquadramento == Enquadramento.rosto;
 
     final Widget conteudo;
@@ -46,7 +48,13 @@ class AvatarNavi extends StatelessWidget {
         width: largura,
         height: altura,
         child: retrato == null
-            ? const _RostoVazio()
+            ? LayoutBuilder(
+                builder: (context, lim) => RostoVetor(
+                  cor: cor,
+                  humor: humor,
+                  tamanho: lim.biggest.shortestSide.isFinite ? lim.biggest.shortestSide : 48,
+                ),
+              )
             : Image.memory(
                 retrato,
                 fit: BoxFit.cover,
@@ -72,73 +80,23 @@ class AvatarNavi extends StatelessWidget {
       conteudo = SizedBox(
         width: largura,
         height: altura,
-        child: _SemModelo(temModelo: arquivos.modelo != null),
+        child: LayoutBuilder(
+          builder: (context, lim) {
+            final h = lim.hasBoundedHeight ? lim.maxHeight : 260.0;
+            final w = lim.hasBoundedWidth ? lim.maxWidth : h;
+            // Cabe no espaço mantendo a proporção 200:240 do desenho.
+            final altNavi = (h * 0.96).clamp(0.0, w * 1.2 * 0.96);
+            return Align(
+              alignment: alinhamento == Alignment.center ? Alignment.bottomCenter : alinhamento,
+              child: NaviVetor(cor: cor, humor: humor, altura: altNavi),
+            );
+          },
+        ),
       );
     }
 
     if (redondo) return ClipOval(child: conteudo);
     if (raio != null) return ClipRRect(borderRadius: raio!, child: conteudo);
     return conteudo;
-  }
-}
-
-/// Foto pequena antes de existir um retrato do modelo.
-class _RostoVazio extends StatelessWidget {
-  const _RostoVazio();
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: Cores.roxoFundo,
-      child: LayoutBuilder(
-        builder: (context, limites) => Icon(
-          Icons.face_retouching_natural_outlined,
-          color: Cores.roxoBorda,
-          size: limites.biggest.shortestSide * 0.5,
-        ),
-      ),
-    );
-  }
-}
-
-/// Palco sem modelo 3D: toque abre a importação.
-class _SemModelo extends StatelessWidget {
-  /// Há modelo, mas esta plataforma não mostra 3D.
-  final bool temModelo;
-  const _SemModelo({required this.temModelo});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: temModelo
-            ? null
-            : () => Navigator.of(context).pushNamed(Rotas.importar),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.view_in_ar_outlined,
-                size: 40,
-                color: Cores.roxoBorda,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                temModelo ? 'o 3D não aparece aqui' : 'nenhum modelo 3D',
-                style: const TextStyle(color: Cores.textoApagado, fontSize: 13),
-              ),
-              if (!temModelo)
-                const Text(
-                  'toque para importar um .vrm',
-                  style: TextStyle(color: Cores.textoFraco, fontSize: 12),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

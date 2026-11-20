@@ -9,7 +9,11 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
-import 'package:codice_app/widgets/cartao_lista.dart';
+import 'package:codice_app/models/humor.dart';
+import 'package:codice_app/widgets/foto_navi.dart';
+import 'package:codice_app/widgets/linha_do_tempo.dart';
+import 'package:codice_app/views/cidade/lugar_tela.dart' show iconeDoFato;
+import 'package:codice_app/widgets/icones.dart';
 
 class DetalheNaviTela extends StatelessWidget {
   final NaviEncontrado navi;
@@ -43,7 +47,7 @@ class DetalheNaviTela extends StatelessWidget {
         children: [
           CabecalhoDetalhe('Encontros / ${atual.nome}'),
           const SizedBox(height: 30),
-          IconeDestaque(atual.gm ? Icons.memory : Icons.smart_toy_outlined, cor: atual.cor),
+          Center(child: FotoNavi(cor: atual.cor, gm: atual.gm, tamanho: 120, redonda: true, humor: Humor.esperando)),
           TituloGrande(
             atual.comoChamar,
             subtitulo: atual.apelido == null
@@ -56,13 +60,13 @@ class DetalheNaviTela extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (atual.gm)
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Pilula(
                       'GM da cidade',
-                      icone: Icons.memory,
+                      icone: Ic.chip,
                       cor: Cores.ciano,
-                      fundo: Color(0x1F65D6D6),
+                      fundo: Cores.ciano.withValues(alpha: 0.12),
                       borda: Cores.ciano,
                     ),
                   ),
@@ -70,7 +74,7 @@ class DetalheNaviTela extends StatelessWidget {
                 Text(
                   'afinidade ${atual.afinidade}% · ${tomEmTexto(atual.tom)} · '
                   '${atual.encontros} ${atual.encontros == 1 ? 'encontro' : 'encontros'}',
-                  style: const TextStyle(color: Cores.roxoClaro, fontSize: 13),
+                  style: TextStyle(color: Cores.roxoClaro, fontSize: 13),
                 ),
                 const SizedBox(height: 8),
                 BarraProgresso(atual.afinidade / 100, cor: atual.cor, altura: 8),
@@ -79,7 +83,7 @@ class DetalheNaviTela extends StatelessWidget {
                 const SizedBox(height: 22),
                 ElevatedButton.icon(
                   onPressed: () => _darApelido(context, atual),
-                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  icon: const IconeCodice(Ic.editar, size: 16),
                   label: Text(atual.apelido == null ? 'dar um apelido' : 'mudar apelido'),
                 ),
               ],
@@ -89,15 +93,18 @@ class DetalheNaviTela extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
             child: Text('HISTÓRICO', style: Estilos.secao),
           ),
-          for (final f in historico.take(20))
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: CartaoLista(
-                icone: Icons.history_rounded,
-                titulo: narrar(f, nome),
-                subtitulo: cidade.quando(f.quandoSegundos),
-              ),
-            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+            child: LinhaDoTempo([
+              for (final f in historico.take(20))
+                ItemTempo(
+                  icone: iconeDoFato(f.tipo),
+                  texto: narrar(f, nome),
+                  quando: cidade.quando(f.quandoSegundos),
+                  cor: atual.cor,
+                ),
+            ]),
+          ),
           const SizedBox(height: 20),
         ],
       ),

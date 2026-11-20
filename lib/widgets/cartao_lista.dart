@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Item de lista em cartão: ícone num quadrado tingido, título e detalhe.
 class CartaoLista extends StatelessWidget {
-  final IconData icone;
-  final Color corIcone;
+  final Ic icone;
+  final Color? corIcone;
   final String titulo;
   final String subtitulo;
   final VoidCallback? onTap;
+
+  /// Substitui o quadrado do ícone (ex.: o retrato de um NAVI).
+  final Widget? lider;
 
   const CartaoLista({
     super.key,
@@ -17,11 +21,13 @@ class CartaoLista extends StatelessWidget {
     required this.titulo,
     required this.subtitulo,
     this.onTap,
-    this.corIcone = Cores.roxo,
+    this.lider,
+    this.corIcone,
   });
 
   @override
   Widget build(BuildContext context) {
+    final destaque = corIcone ?? Cores.roxo;
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: Efeitos.volume(Cores.cartao),
@@ -39,15 +45,16 @@ class CartaoLista extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
           child: Row(
             children: [
+              lider ??
               Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: corIcone.withValues(alpha: 0.13),
+                  color: destaque.withValues(alpha: 0.13),
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: corIcone.withValues(alpha: 0.3)),
+                  border: Border.all(color: destaque.withValues(alpha: 0.3)),
                 ),
-                child: Icon(icone, color: corIcone, size: 24),
+                child: IconeCodice(icone, color: destaque, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -56,9 +63,9 @@ class CartaoLista extends StatelessWidget {
                   children: [
                     Text(
                       titulo,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                      style: TextStyle(
+                        color: Cores.texto,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -67,7 +74,7 @@ class CartaoLista extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Cores.textoApagado),
+              if (onTap != null) IconeCodice(Ic.setaDir, color: Cores.textoApagado),
             ],
           ),
         ),
@@ -79,7 +86,7 @@ class CartaoLista extends StatelessWidget {
 
 /// Cartão de resumo no topo das listas (Cidade, Encontros).
 class CartaoDestaque extends StatelessWidget {
-  final IconData icone;
+  final Ic icone;
   final Color cor;
   final String titulo;
   final String texto;
@@ -116,7 +123,7 @@ class CartaoDestaque extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: Efeitos.brilho(cor, forca: 0.3, desfoque: 20),
             ),
-            child: Icon(icone, color: cor, size: 26),
+            child: IconeCodice(icone, color: cor, size: 26),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -149,24 +156,25 @@ class CartaoDestaque extends StatelessWidget {
 
 /// Ícone grande em círculo, usado no topo das telas de detalhe.
 class IconeDestaque extends StatelessWidget {
-  final IconData icone;
-  final Color cor;
+  final Ic icone;
+  final Color? cor;
 
-  const IconeDestaque(this.icone, {super.key, this.cor = Cores.roxo});
+  const IconeDestaque(this.icone, {super.key, this.cor});
 
   @override
   Widget build(BuildContext context) {
+    final destaque = cor ?? Cores.roxo;
     return Center(
       child: Container(
         width: 105,
         height: 105,
         decoration: BoxDecoration(
-          color: cor.withValues(alpha: 0.12),
+          color: destaque.withValues(alpha: 0.12),
           shape: BoxShape.circle,
-          border: Border.all(color: cor.withValues(alpha: 0.7), width: 1.5),
-          boxShadow: Efeitos.brilho(cor, forca: 0.3, desfoque: 36),
+          border: Border.all(color: destaque.withValues(alpha: 0.7), width: 1.5),
+          boxShadow: Efeitos.brilho(destaque, forca: 0.3, desfoque: 36),
         ),
-        child: Icon(icone, color: cor, size: 44),
+        child: Center(child: IconeCodice(icone, color: destaque, size: 46)),
       ),
     );
   }

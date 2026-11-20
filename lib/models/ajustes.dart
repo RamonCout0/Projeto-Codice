@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// Aparência do app: segue o aparelho, ou fixa o tema claro ou o noturno.
+enum ModoTema { sistema, claro, escuro }
+
 /// Preferências do app, guardadas em ajustes.json na pasta do aparelho.
 class Ajustes extends ChangeNotifier {
   /// Endereço do Ollama no PC. Dá para fixar na hora de rodar:
@@ -19,9 +22,9 @@ class Ajustes extends ChangeNotifier {
 
   String enderecoOllama = enderecoPadrao;
   String modelo = modeloPadrao;
-  bool falasEmNavides = true;
-  bool avisarEncontros = true;
-  bool relatoDaCidade = false;
+
+  /// O noturno é a cara do app, então é o padrão.
+  ModoTema modoTema = ModoTema.escuro;
 
   File? _arquivo;
 
@@ -34,9 +37,7 @@ class Ajustes extends ChangeNotifier {
           jsonDecode(await _arquivo!.readAsString()) as Map<String, dynamic>;
       enderecoOllama = j['enderecoOllama'] as String? ?? enderecoOllama;
       modelo = j['modelo'] as String? ?? modelo;
-      falasEmNavides = j['falasEmNavides'] as bool? ?? falasEmNavides;
-      avisarEncontros = j['avisarEncontros'] as bool? ?? avisarEncontros;
-      relatoDaCidade = j['relatoDaCidade'] as bool? ?? relatoDaCidade;
+      modoTema = ModoTema.values.where((m) => m.name == j['modoTema']).firstOrNull ?? modoTema;
       notifyListeners();
     } catch (_) {
       // Sem pasta (testes) ou arquivo corrompido: fica com o padrão.
@@ -51,9 +52,7 @@ class Ajustes extends ChangeNotifier {
       jsonEncode({
         'enderecoOllama': enderecoOllama,
         'modelo': modelo,
-        'falasEmNavides': falasEmNavides,
-        'avisarEncontros': avisarEncontros,
-        'relatoDaCidade': relatoDaCidade,
+        'modoTema': modoTema.name,
       }),
     );
   }

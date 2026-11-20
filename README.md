@@ -196,6 +196,38 @@ sem configurar nada). Na tela inicial, **criar meu NAVI** abre o cadastro e
 A cidade que continua viva com o app fechado roda num servidor próprio, em Go,
 com API de requisições assinadas (Ed25519). Veja [servidor/README.md](servidor/README.md).
 
+## Rodando com os servidores
+
+O app fala com dois servidores (veja [servidor/README.md](servidor/README.md)):
+a API de login (Node, `api/servidor.mjs`) e a NAVICity (Go). Os endereços vão
+na hora de rodar:
+
+```sh
+flutter run \
+  --dart-define=CODICE_API_URL=http://100.x.y.z:8081 \
+  --dart-define=NAVICITY_URL=http://100.x.y.z:8080
+```
+
+HTTP só é aceito em `localhost` e na rede do Tailscale (`100.64.0.0/10`), que já
+vai criptografada ponta a ponta; qualquer outro endereço precisa ser HTTPS.
+Depois do login, o app entra na NAVICity com uma identidade Ed25519 por conta.
+Cidade, lugares, encontros e as novidades da Home vêm dos fatos do servidor;
+as memórias do diário ficam no aparelho e a idade da NAVI cresce com elas.
+
+## Visual: tema claro, noturno e arte vetorial
+
+- **Aparência:** noturno, claro ou o do aparelho, em **Menu → Configurações**.
+  As duas paletas são as do Figma (`lib/tema/cores.dart`).
+- **Arte vetorial original:** todos os ícones (`assets/icones/`), a NAVI com
+  seis expressões (`assets/arte/navi_*.svg`, recolorida pelo elemento) e o logo
+  foram desenhados para o projeto. Os SVGs dos ícones e da NAVI são gerados por
+  `tools/arte/` (`python3 tools/arte/gerar_icones.py`).
+- **Tipografia:** Inter (licença OFL, em `assets/fontes/`).
+- **Capturas de tela sem celular:**
+  `CAPTURAS=1 flutter test --update-goldens test/capturas/capturas_test.dart`
+  (use `CAPTURAS_TEMA=claro` para o tema claro). As imagens saem em
+  `test/capturas/saida/`.
+
 ## Além das atividades
 
 Conversa com IA local, NAVI em 3D, animações do Mixamo e 3D na web:

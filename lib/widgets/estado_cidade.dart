@@ -3,6 +3,7 @@ import 'package:codice_app/controllers/cidade_navi.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/basicos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Cartão para quando a cidade ainda não deu dados: conectando, fora do ar
 /// ou sem conexão iniciada.
@@ -27,8 +28,8 @@ class AvisoCidade extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 3),
             )
           else
-            Icon(
-              erro ? Icons.cloud_off_outlined : Icons.location_city,
+            IconeCodice(
+              erro ? Ic.nuvemOff : Ic.cidade,
               color: erro ? Cores.vermelho : Cores.textoApagado,
               size: 32,
             ),

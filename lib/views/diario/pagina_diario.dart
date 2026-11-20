@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/basicos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 String plural(int n, String palavra) =>
     '$n ${n == 1 ? palavra : '${palavra}s'}';
@@ -30,7 +31,7 @@ class PaginaDiario extends StatelessWidget {
     final falta = minimo - palavras;
     final pronto = falta <= 0;
     final corStatus = pronto ? Cores.verde : Cores.ambar;
-    const estiloTexto = TextStyle(
+    final estiloTexto = TextStyle(
       color: Cores.texto,
       fontSize: 15,
       height: 1.55,
@@ -62,17 +63,17 @@ class PaginaDiario extends StatelessWidget {
                 hintText:
                     'Acordei mal de novo, não preguei o olho. '
                     'A prova de física ficou pra quinta...',
-                hintStyle: estiloTexto.copyWith(color: const Color(0xFF5E5869)),
+                hintStyle: estiloTexto.copyWith(color: Cores.textoFraco),
               ),
             ),
           ),
-          const Divider(height: 18, color: Color(0xFF2D2937)),
+          Divider(height: 18, color: Cores.linha),
           Row(
             children: [
               Text(plural(palavras, 'palavra'), style: Estilos.rotulo),
               const Spacer(),
-              Icon(
-                pronto ? Icons.check_circle_outline : Icons.hourglass_empty,
+              IconeCodice(
+                pronto ? Ic.checkCirculo : Ic.ampulheta,
                 color: corStatus,
                 size: 12,
               ),
@@ -95,18 +96,18 @@ class PaginaDiario extends StatelessWidget {
   }
 }
 
-/// Explicação fixa no fim da página.
+/// Dica no fim da página.
 class DicaDiario extends StatelessWidget {
   const DicaDiario({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Painel(
+    return Painel(
       cor: Cores.cartaoClaro,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.cloud_outlined, color: Color(0xFF8F899B), size: 17),
+          IconeCodice(Ic.lampada, color: Cores.ambar, size: 18),
           SizedBox(width: 9),
           Expanded(
             child: Text.rich(
@@ -116,18 +117,18 @@ class DicaDiario extends StatelessWidget {
                     text: 'escreva solto, do tamanho que der\n',
                     style: TextStyle(
                       color: Cores.texto,
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   TextSpan(
                     text:
-                        'de madrugada, carregando, ela lê o dia e propõe '
-                        'fatos. nada vira memória sem você confirmar.',
+                        'nada vira memória sem você confirmar. quanto mais '
+                        'você ensina, mais ela cresce.',
                     style: TextStyle(
-                      color: Color(0xFF777181),
-                      fontSize: 12,
-                      height: 1.35,
+                      color: Cores.textoApagado,
+                      fontSize: 13,
+                      height: 1.4,
                     ),
                   ),
                 ],

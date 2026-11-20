@@ -6,6 +6,7 @@ import 'package:codice_app/app/navegacao_abas.dart';
 import 'package:codice_app/controllers/cidade_navi.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/app/rotas.dart';
+import 'package:codice_app/widgets/ambiente.dart';
 import 'package:codice_app/widgets/menu.dart';
 import 'package:codice_app/widgets/navegacao_inferior.dart';
 
@@ -76,7 +77,10 @@ class _AppShellState extends State<AppShell> {
       child: Scaffold(
         key: _scaffold,
         drawer: const MenuLateral(),
-        body: SafeArea(
+        body: Stack(
+          children: [
+            const Positioned.fill(child: FundoAmbiente()),
+            SafeArea(
           bottom: false,
           child: IndexedStack(
             index: aba,
@@ -91,6 +95,8 @@ class _AppShellState extends State<AppShell> {
                 ),
             ],
           ),
+        ),
+          ],
         ),
         bottomNavigationBar: SafeArea(
           top: false,

@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^10.0.0
+  flutter_svg: ^2.2.0
   http: ^1.6.0
   path_provider: ^2.1.6
   provider: ^6.1.5
@@ -22,8 +23,22 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fontes/Inter-Regular.ttf
+        - asset: assets/fontes/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fontes/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fontes/Inter-Bold.ttf
+          weight: 700
+        - asset: assets/fontes/Inter-ExtraBold.ttf
+          weight: 800
   assets:
     - assets/navis/
     - assets/navi_3d/
+    - assets/icones/
+    - assets/arte/
     # Modelo e animações da apresentação (fora do Git). Veja o LEIA-ME de lá.
     - assets/navi_local/

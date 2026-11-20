@@ -9,6 +9,7 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/views/diario/dialogos_diario.dart';
 import 'package:codice_app/widgets/basicos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// O que está acontecendo agora, sempre com dados reais:
 ///  1. uma pergunta que a NAVI quer fazer (duas memórias se contradizem);
@@ -28,7 +29,7 @@ class CartaoNovidade extends StatelessWidget {
     if (pergunta != null) {
       return _Cartao(
         ambar: true,
-        icone: Icons.favorite_border_rounded,
+        icone: Ic.coracao,
         rotulo: '$nome quer entender uma coisa',
         titulo: '«${pergunta.texto}»',
         texto: 'duas coisas que ela guarda se contradizem.',
@@ -39,7 +40,7 @@ class CartaoNovidade extends StatelessWidget {
 
     if (cidade.estado == EstadoCidade.erro && cidade.fatos.isEmpty) {
       return _Cartao(
-        icone: Icons.cloud_off_outlined,
+        icone: Ic.nuvemOff,
         cor: Cores.vermelho,
         rotulo: 'NAVICITY FORA DO AR',
         titulo: 'Não consegui falar com a cidade',
@@ -51,7 +52,7 @@ class CartaoNovidade extends StatelessWidget {
 
     if (cidade.estado == EstadoCidade.conectando || cidade.situacao == null) {
       return const _Cartao(
-        icone: Icons.sync,
+        icone: Ic.sync,
         rotulo: 'NAVICITY',
         titulo: 'Conectando…',
         texto: 'Entrando na cidade com o seu NAVI.',
@@ -62,7 +63,7 @@ class CartaoNovidade extends StatelessWidget {
     final ultimo = cidade.ultimoFato;
     if (ultimo != null) {
       return _Cartao(
-        icone: Icons.location_city,
+        icone: Ic.cidade,
         rotulo: 'NA CIDADE · ${cidade.quando(ultimo.quandoSegundos).toUpperCase()}',
         titulo: narrar(ultimo, nome),
         texto: 'Toque para ver os encontros.',
@@ -71,7 +72,7 @@ class CartaoNovidade extends StatelessWidget {
     }
 
     return _Cartao(
-      icone: Icons.location_city,
+      icone: Ic.cidade,
       rotulo: 'NA CIDADE',
       titulo: '$nome está em ${cidade.situacao!.area}',
       texto: 'Ainda não aconteceu nada. Em breve ela encontra alguém.',
@@ -88,13 +89,13 @@ class CartaoNovidade extends StatelessWidget {
     avisar(
       context,
       mudou ? 'memória antiga substituída' : 'as duas memórias foram mantidas',
-      icone: Icons.sync_alt,
+      icone: Ic.troca,
     );
   }
 }
 
 class _Cartao extends StatelessWidget {
-  final IconData icone;
+  final Ic icone;
   final String rotulo;
   final String titulo;
   final String texto;
@@ -102,7 +103,7 @@ class _Cartao extends StatelessWidget {
   final VoidCallback? aoTocar;
   final bool ambar;
   final bool carregando;
-  final Color cor;
+  final Color? cor;
 
   const _Cartao({
     required this.icone,
@@ -113,12 +114,12 @@ class _Cartao extends StatelessWidget {
     this.aoTocar,
     this.ambar = false,
     this.carregando = false,
-    this.cor = Cores.roxo,
+    this.cor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final destaque = ambar ? Cores.ambar : cor;
+    final destaque = ambar ? Cores.ambar : (cor ?? Cores.roxo);
     final conteudo = Painel(
       cor: ambar ? Cores.ambarFundo : Cores.cartao,
       borda: ambar ? Cores.ambarBorda : destaque.withValues(alpha: 0.35),
@@ -131,7 +132,7 @@ class _Cartao extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(icone, color: destaque, size: 17),
+                    IconeCodice(icone, color: destaque, size: 17),
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
@@ -151,8 +152,8 @@ class _Cartao extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   titulo,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Cores.texto,
                     fontSize: 16,
                     height: 1.3,
                     fontWeight: FontWeight.w700,
@@ -195,7 +196,7 @@ class _Cartao extends StatelessWidget {
 
 /// Atalho da Home: ícone num quadrado tingido e o nome da ação.
 class AcaoRapida extends StatelessWidget {
-  final IconData icone;
+  final Ic icone;
   final String rotulo;
   final VoidCallback onTap;
 
@@ -221,12 +222,12 @@ class AcaoRapida extends StatelessWidget {
                   color: Cores.roxo.withValues(alpha: 0.13),
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(icone, color: Cores.roxo, size: 22),
+                child: IconeCodice(icone, color: Cores.roxo, size: 22),
               ),
               const SizedBox(height: 7),
               Text(
                 rotulo,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Cores.textoSuave,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -257,11 +258,11 @@ class PainelCrescimento extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text('CRESCIMENTO', style: Estilos.secao),
+              Text('CRESCIMENTO', style: Estilos.secao),
               const Spacer(),
               Text(
                 '${estado.idade} anos',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Cores.verde,
                   fontSize: 15,
                   fontWeight: FontWeight.w800,

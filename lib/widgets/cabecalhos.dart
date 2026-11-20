@@ -7,6 +7,7 @@ import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/menu.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Linha do topo das abas: menu, nome da aba e o retrato do NAVI (que abre
 /// a personalidade).
@@ -73,7 +74,7 @@ class CabecalhoDetalhe extends StatelessWidget {
           IconButton(
             tooltip: 'voltar',
             onPressed: () => Navigator.maybePop(context),
-            icon: const Icon(Icons.arrow_back_rounded, size: 22),
+            icon: const IconeCodice(Ic.voltar, size: 22),
           ),
           Expanded(
             child: Text(
@@ -91,13 +92,19 @@ class CabecalhoDetalhe extends StatelessWidget {
 class TituloGrande extends StatelessWidget {
   final String texto;
   final String? subtitulo;
+  final EdgeInsetsGeometry padding;
 
-  const TituloGrande(this.texto, {super.key, this.subtitulo});
+  const TituloGrande(
+    this.texto, {
+    super.key,
+    this.subtitulo,
+    this.padding = const EdgeInsets.fromLTRB(20, 16, 20, 0),
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

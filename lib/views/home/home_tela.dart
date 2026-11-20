@@ -10,6 +10,7 @@ import 'package:codice_app/views/home/palco_navi.dart';
 import 'package:codice_app/views/home/partes_home.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 class HomeTela extends StatelessWidget {
   const HomeTela({super.key});
@@ -35,25 +36,25 @@ class HomeTela extends StatelessWidget {
         Row(
           children: [
             AcaoRapida(
-              Icons.edit_note_rounded,
+              Ic.escrever,
               'escrever',
               onTap: () => context.read<NavegacaoAbas>().irPara(2),
             ),
             const SizedBox(width: 10),
             AcaoRapida(
-              Icons.chat_bubble_outline_rounded,
+              Ic.conversa,
               'conversar',
               onTap: () => context.read<NavegacaoAbas>().irPara(1),
             ),
             const SizedBox(width: 10),
             AcaoRapida(
-              Icons.location_city,
+              Ic.cidade,
               'cidade',
               onTap: () => context.read<NavegacaoAbas>().irPara(3),
             ),
             const SizedBox(width: 10),
             AcaoRapida(
-              Icons.people_outline_rounded,
+              Ic.pessoas,
               'encontros',
               onTap: () => context.read<NavegacaoAbas>().irPara(4),
             ),
@@ -112,8 +113,8 @@ class _Identidade extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
-                  Icons.edit_outlined,
+                IconeCodice(
+                  Ic.editar,
                   size: 16,
                   color: Cores.textoFraco,
                 ),
@@ -135,14 +136,14 @@ class _Identidade extends StatelessWidget {
             ),
             Pilula(
               '${context.watch<EstadoCodice>().idade} anos · ${context.watch<EstadoCodice>().fase}',
-              icone: Icons.cake_outlined,
+              icone: Ic.bolo,
               cor: Cores.textoSuave,
               fundo: Cores.cartao,
               borda: Cores.borda,
             ),
             Pilula(
               '3D',
-              icone: Icons.view_in_ar_outlined,
+              icone: Ic.cubo,
               onTap: () => Navigator.of(
                 context,
                 rootNavigator: true,

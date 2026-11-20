@@ -14,6 +14,7 @@ import 'package:codice_app/views/diario/pagina_diario.dart';
 import 'package:codice_app/views/diario/rodape_diario.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 class DiarioTela extends StatefulWidget {
   const DiarioTela({super.key});
@@ -85,7 +86,7 @@ class _DiarioTelaState extends State<DiarioTela> {
 
   void _avisar(
     String msg, {
-    IconData icone = Icons.info_outline,
+    Ic icone = Ic.info,
     SnackBarAction? acao,
   }) => avisar(context, msg, icone: icone, acao: acao);
 
@@ -179,7 +180,7 @@ class _DiarioTelaState extends State<DiarioTela> {
     );
     _avisar(
       'memória guardada · ${nova.etiquetas.join(', ')}',
-      icone: Icons.bookmark_added_outlined,
+      icone: Ic.marcadorOk,
       acao: SnackBarAction(label: 'ver', onPressed: _abrirMemorias),
     );
 
@@ -219,7 +220,7 @@ class _DiarioTelaState extends State<DiarioTela> {
     );
     _avisar(
       mudou ? 'memória antiga substituída' : 'as duas memórias foram mantidas',
-      icone: Icons.sync_alt,
+      icone: Ic.troca,
     );
   }
 
@@ -229,7 +230,7 @@ class _DiarioTelaState extends State<DiarioTela> {
     _texto.text.isEmpty
         ? 'não tem nada para apagar.'
         : 'segure o botão para apagar — assim nada some sem querer.',
-    icone: Icons.touch_app_outlined,
+    icone: Ic.toque,
   );
 
   void _apagar() {
@@ -240,7 +241,7 @@ class _DiarioTelaState extends State<DiarioTela> {
     _falar('apagou? tudo bem, eu ainda não tinha guardado.', Humor.pensando);
     _avisar(
       'texto apagado',
-      icone: Icons.delete_outline,
+      icone: Ic.apagar,
       acao: SnackBarAction(
         label: 'desfazer',
         onPressed: () {
@@ -342,14 +343,14 @@ class _DiarioTelaState extends State<DiarioTela> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Diário', style: Estilos.titulo),
+                        Text('Diário', style: Estilos.titulo),
                         Text(_dataDeHoje(), style: Estilos.legenda),
                       ],
                     ),
                   ),
                   Pilula(
                     '${context.watch<EstadoCodice>().memorias.length} memórias',
-                    icone: Icons.bookmarks_outlined,
+                    icone: Ic.marcadores,
                     onTap: _abrirMemorias,
                   ),
                 ],

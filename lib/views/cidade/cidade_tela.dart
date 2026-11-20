@@ -7,6 +7,7 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/cartao_lista.dart';
 import 'package:codice_app/widgets/estado_cidade.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 class CidadeTela extends StatelessWidget {
   const CidadeTela({super.key});
@@ -40,7 +41,7 @@ class CidadeTela extends StatelessWidget {
                   AvisoCidade(cidade)
                 else ...[
                   CartaoDestaque(
-                    icone: Icons.location_city,
+                    icone: Ic.cidade,
                     cor: Cores.ciano,
                     titulo: 'NAVICity',
                     texto:

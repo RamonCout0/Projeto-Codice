@@ -5,6 +5,7 @@ import 'package:codice_app/models/memoria.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/basicos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// "Posso guardar isso?" — nada vira memória sem confirmação.
 Future<bool?> confirmarGuardar(
@@ -27,10 +28,10 @@ Future<bool?> confirmarGuardar(
             etiquetas.isEmpty
                 ? 'sem etiqueta — vai como "geral".'
                 : 'etiquetas: ${etiquetas.join(', ')}',
-            style: const TextStyle(color: Cores.roxoClaro, fontSize: 12),
+            style: TextStyle(color: Cores.roxoClaro, fontSize: 12),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'nada vira memória sem você confirmar.',
             style: Estilos.legenda,
           ),
@@ -58,14 +59,14 @@ Future<bool?> perguntarContradicao(BuildContext context, Memoria antiga) {
       backgroundColor: Cores.ambarFundo,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: Cores.ambarBorda),
+        side: BorderSide(color: Cores.ambarBorda),
       ),
-      icon: const Icon(Icons.favorite_border, color: Cores.ambar),
+      icon: IconeCodice(Ic.coracao, color: Cores.ambar),
       title: Text('«${antiga.etiquetas.contains('emprego') ? 'Você mudou de emprego?' : 'Isso mudou?'}»'),
       content: Text(
         'antes você me contou: «${antiga.texto}»\n\n'
         'dois fatos que eu guardo se contradizem.',
-        style: const TextStyle(color: Cores.ambarTexto, fontSize: 13),
+        style: TextStyle(color: Cores.ambarTexto, fontSize: 13),
       ),
       actions: [
         TextButton(
@@ -130,7 +131,7 @@ void mostrarMemorias(BuildContext context, List<Memoria> memorias) {
             style: Estilos.tituloDialogo,
           ),
           const SizedBox(height: 2),
-          const Text('só o que você confirmou.', style: Estilos.legenda),
+          Text('só o que você confirmou.', style: Estilos.legenda),
           const SizedBox(height: 12),
           Flexible(
             child: ListView.separated(
@@ -168,7 +169,7 @@ class _CartaoMemoria extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '${memoria.etiquetas.join(' · ')}  ·  ${q.day}/${q.month}',
-            style: const TextStyle(color: Cores.roxoClaro, fontSize: 12),
+            style: TextStyle(color: Cores.roxoClaro, fontSize: 12),
           ),
         ],
       ),

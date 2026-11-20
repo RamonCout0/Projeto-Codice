@@ -1,59 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// O elemento muda o jeito de ser e de falar do NAVI.
 enum Elemento {
   gelo(
     'Gelo',
-    Icons.ac_unit,
-    Color(0xFF8FD8FF),
+    Ic.floco,
+    Color(0xFF8FE3F0),
+    Color(0xFF128299),
     'calma e observadora; fala com frases limpas e precisas, sem exagero, '
         'e gosta de silêncio e de coisas frias',
   ),
   fogo(
     'Fogo',
-    Icons.local_fire_department_outlined,
-    Color(0xFFFF8A5B),
+    Ic.chama,
+    Color(0xFFFF5A36),
+    Color(0xFFC4351A),
     'animada e intensa; fala com entusiasmo, se empolga fácil e torce '
         'pela pessoa',
   ),
   agua(
     'Água',
-    Icons.water_drop_outlined,
-    Color(0xFF5BA8FF),
+    Ic.gota,
+    Color(0xFF3D8BFF),
+    Color(0xFF1F5FD0),
     'gentil e acolhedora; adapta o tom ao humor da pessoa e gosta mais de '
         'ouvir do que de falar',
   ),
   terra(
     'Terra',
-    Icons.landscape_outlined,
-    Color(0xFFC2A36B),
+    Ic.montanha,
+    Color(0xFF5FC97F),
+    Color(0xFF22834A),
     'paciente e prática; fala devagar, gosta de rotina e de coisas '
         'concretas do dia a dia',
   ),
   ar(
     'Ar',
-    Icons.air,
-    Color(0xFFB8F2E6),
+    Ic.vento,
+    Color(0xFFC9A7FF),
+    Color(0xFF7444DC),
     'leve e distraída; faz perguntas soltas, muda de assunto e adora '
         'novidades',
   ),
   luz(
     'Luz',
-    Icons.wb_sunny_outlined,
-    Color(0xFFFFD86B),
+    Ic.sol,
+    Color(0xFFFFE08A),
+    Color(0xFFA67A00),
     'otimista; procura o lado bom das coisas e elogia com sinceridade',
   ),
   sombra(
     'Sombra',
-    Icons.nightlight_outlined,
+    Ic.lua,
     Color(0xFFA08BD9),
+    Color(0xFF5B4A9E),
     'reservada e misteriosa; fala pouco, mas repara em detalhes que '
         'ninguém percebe',
   ),
   eletrico(
     'Elétrico',
-    Icons.bolt,
-    Color(0xFFF5F06B),
+    Ic.raio,
+    Color(0xFFFFD23F),
+    Color(0xFF9C7400),
     'rápida e agitada; pensa alto, junta ideias depressa e adora jogos e '
         'desafios',
   ),
@@ -61,23 +71,36 @@ enum Elemento {
   // registrar com ele, e a tela de criação não o oferece.
   cyber(
     'Cyber',
-    Icons.memory,
-    Color(0xFF3DF2E0),
+    Ic.chip,
+    Color(0xFF31DDD2),
+    Color(0xFF0A8C84),
     'precisa e analítica; fala como quem enxerga a cidade inteira de cima, '
         'com calma e um toque de ironia',
     soGM: true,
   );
 
   final String titulo;
-  final IconData icone;
-  final Color cor;
+  final Ic icone;
+  final Color _corNoEscuro;
+  final Color _corNoClaro;
+
+  /// A cor do elemento no tema atual: a do Figma no noturno e a versão
+  /// "sobre papel" (mais escura, legível) no claro.
+  Color get cor => Cores.claro ? _corNoClaro : _corNoEscuro;
 
   /// Como o Gemma deve interpretar este elemento.
   final String jeito;
 
   /// Só game masters têm; nenhum jogador pode escolher.
   final bool soGM;
-  const Elemento(this.titulo, this.icone, this.cor, this.jeito, {this.soGM = false});
+  const Elemento(
+    this.titulo,
+    this.icone,
+    this._corNoEscuro,
+    this._corNoClaro,
+    this.jeito, {
+    this.soGM = false,
+  });
 
   /// Os elementos que a pessoa pode escolher ao criar o NAVI.
   static List<Elemento> get escolhiveis => [

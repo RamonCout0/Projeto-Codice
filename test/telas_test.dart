@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:codice_app/app/raiz.dart';
 import 'package:codice_app/controllers/cidade_navi.dart';
 import 'package:codice_app/services/api_navicity.dart';
+import 'package:codice_app/widgets/foto_navi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -94,7 +95,8 @@ void main() {
     await t.tap(find.text('Encontros').last);
     await t.pumpAndSettle();
     expect(find.textContaining('Iris'), findsWidgets);
-    expect(find.textContaining('· GM'), findsOneWidget);
+    // O selo de GM é um emblema no retrato da Iris (e só nela).
+    expect(t.widgetList<FotoNavi>(find.byType(FotoNavi)).where((f) => f.gm).length, 1);
     await t.tap(find.text('Zeta'));
     await t.pumpAndSettle();
     expect(find.text('dar um apelido'), findsOneWidget);

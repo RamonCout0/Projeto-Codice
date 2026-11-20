@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// No celular não faz nada. Em tela larga (PC/projetor) desenha um
 /// "celular" no meio, para apresentar o app como ele fica no aparelho, e
@@ -91,7 +92,7 @@ class _Legenda extends StatelessWidget {
   Widget build(BuildContext context) {
     // Fora do Navigator/Scaffold: o texto precisa do próprio estilo base.
     return DefaultTextStyle(
-      style: const TextStyle(color: Cores.textoSuave, fontSize: 14, height: 1.5),
+      style: TextStyle(color: Cores.textoSuave, fontSize: 14, height: 1.5),
       child: SizedBox(
         width: 320,
         child: Column(
@@ -103,20 +104,20 @@ class _Legenda extends StatelessWidget {
               height: 56,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [Cores.roxoClaro, Color(0xFF7A5CF0)],
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.auto_stories, color: Color(0xFF1B1725), size: 28),
+              child: const IconeCodice(Ic.livroAberto, color: Color(0xFF1B1725), size: 28),
             ),
             const SizedBox(height: 22),
-            const Text(
+            Text(
               'Códice',
               style: TextStyle(
-                color: Colors.white,
+                color: Cores.texto,
                 fontSize: 46,
                 fontWeight: FontWeight.w800,
                 height: 1.1,
@@ -129,22 +130,22 @@ class _Legenda extends StatelessWidget {
             ),
             const SizedBox(height: 26),
             for (final (icone, texto) in const [
-              (Icons.view_in_ar_outlined, 'NAVI em 3D com animações do Mixamo'),
-              (Icons.psychology_outlined, 'personalidade interpretada pelo Gemma'),
-              (Icons.lock_outline, 'login JWT com armazenamento seguro'),
+              (Ic.cubo, 'NAVI em 3D com animações do Mixamo'),
+              (Ic.navi, 'personalidade interpretada pelo Gemma'),
+              (Ic.cadeado, 'login JWT com armazenamento seguro'),
             ])
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   children: [
-                    Icon(icone, size: 18, color: Cores.roxoClaro),
+                    IconeCodice(icone, size: 18, color: Cores.roxoClaro),
                     const SizedBox(width: 10),
                     Expanded(child: Text(texto)),
                   ],
                 ),
               ),
             const SizedBox(height: 22),
-            const Text(
+            Text(
               'Desenvolvimento para Dispositivos Móveis\n'
               'Ramon Couto Santo e Aaron Guerra Goldberg',
               style: TextStyle(color: Cores.textoFraco, fontSize: 12),

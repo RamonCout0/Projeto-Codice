@@ -5,6 +5,7 @@ import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/services/api_codice.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Registro, login JWT e consulta protegida dos NAVIs (atividade de
 /// comunicação segura). Veja COMUNICACAO_SEGURA.md.
@@ -180,10 +181,10 @@ class _SessaoSeguraTelaState extends State<SessaoSeguraTela> {
             children: [
               _Cabecalho(
                 icone: _consultando
-                    ? Icons.verified_user_outlined
+                    ? Ic.escudoOk
                     : _criandoConta
-                    ? Icons.person_add_alt_1_outlined
-                    : Icons.lock_outline,
+                    ? Ic.pessoaMais
+                    : Ic.cadeado,
                 titulo: _consultando
                     ? 'Sessão protegida'
                     : _criandoConta
@@ -201,7 +202,7 @@ class _SessaoSeguraTelaState extends State<SessaoSeguraTela> {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle_outline, size: 16, color: Cores.verde),
+                      IconeCodice(Ic.checkCirculo, size: 16, color: Cores.verde),
                       const SizedBox(width: 8),
                       Expanded(child: Text(_aviso!, style: Estilos.corpo)),
                     ],
@@ -245,7 +246,7 @@ class _SessaoSeguraTelaState extends State<SessaoSeguraTela> {
                             backgroundColor: Cores.roxoFundo,
                             child: Text(
                               '${navi.id}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Cores.roxoClaro,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -368,7 +369,7 @@ class _SessaoSeguraTelaState extends State<SessaoSeguraTela> {
 }
 
 class _Cabecalho extends StatelessWidget {
-  final IconData icone;
+  final Ic icone;
   final String titulo;
   final String texto;
   const _Cabecalho({required this.icone, required this.titulo, required this.texto});
@@ -385,7 +386,7 @@ class _Cabecalho extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Cores.roxoBorda),
           ),
-          child: Icon(icone, color: Cores.roxoClaro, size: 22),
+          child: IconeCodice(icone, color: Cores.roxoClaro, size: 22),
         ),
         const SizedBox(width: 14),
         Expanded(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:codice_app/models/humor.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Cor da borda e ícone do balão para cada humor.
 extension HumorVisual on Humor {
@@ -13,12 +14,12 @@ extension HumorVisual on Humor {
     Humor.pensando => Cores.textoApagado,
   };
 
-  IconData get icone => switch (this) {
-    Humor.esperando => Icons.more_horiz,
-    Humor.lendo => Icons.menu_book_outlined,
-    Humor.curiosa => Icons.lightbulb_outline,
-    Humor.feliz => Icons.favorite,
-    Humor.confusa => Icons.help_outline,
-    Humor.pensando => Icons.psychology_outlined,
+  Ic get icone => switch (this) {
+    Humor.esperando => Ic.maisHoriz,
+    Humor.lendo => Ic.livroAberto,
+    Humor.curiosa => Ic.lampada,
+    Humor.feliz => Ic.coracaoCheio,
+    Humor.confusa => Ic.ajuda,
+    Humor.pensando => Ic.navi,
   };
 }

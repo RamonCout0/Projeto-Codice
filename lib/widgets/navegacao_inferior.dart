@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:codice_app/app/abas.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/efeitos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Barra das abas flutuante: uma cápsula com cantos bem arredondados que
 /// "descola" do fundo; a aba aberta ganha uma pílula roxa.
@@ -41,8 +42,8 @@ class NavegacaoInferior extends StatelessWidget {
             destinations: [
               for (final aba in abas)
                 NavigationDestination(
-                  icon: Icon(aba.icone, color: Cores.textoApagado, size: 23),
-                  selectedIcon: Icon(aba.icone, color: Cores.roxoClaro, size: 23),
+                  icon: IconeCodice(aba.icone, color: Cores.textoApagado, size: 23),
+                  selectedIcon: IconeCodice(aba.icone, color: Cores.roxoClaro, size: 23),
                   label: aba.nome,
                 ),
             ],

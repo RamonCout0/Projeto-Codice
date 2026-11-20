@@ -7,6 +7,7 @@ import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/navi_3d.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Traz o modelo .vrm da NAVI e as animações (.vrma ou .fbx do Mixamo)
 /// para dentro do app.
@@ -26,7 +27,7 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
     final erro = await acao();
     if (!mounted) return;
     setState(() => _ocupado = false);
-    if (erro != null) avisar(context, erro, icone: Icons.error_outline);
+    if (erro != null) avisar(context, erro, icone: Ic.erro);
   }
 
   @override
@@ -48,7 +49,7 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('MODELO (.vrm)', style: Estilos.secao),
+                  Text('MODELO (.vrm)', style: Estilos.secao),
                   const SizedBox(height: 8),
                   Painel(
                     child: Row(
@@ -90,7 +91,7 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                     onPressed: _ocupado
                         ? null
                         : () => _executar(arquivos.importarModelo),
-                    icon: const Icon(Icons.file_open_outlined, size: 18),
+                    icon: const IconeCodice(Ic.arquivoAbrir, size: 18),
                     label: Text(
                       arquivos.modeloImportado
                           ? 'trocar modelo'
@@ -108,9 +109,9 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                       child: const Text('remover modelo'),
                     ),
                   const SizedBox(height: 20),
-                  const Text('ANIMAÇÕES (.vrma OU MIXAMO .fbx)', style: Estilos.secao),
+                  Text('ANIMAÇÕES (.vrma OU MIXAMO .fbx)', style: Estilos.secao),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'opcional. sem elas, a NAVI usa movimentos simples feitos pelo app. '
                     'do mixamo.com: baixe em FBX Binary, "Without Skin".',
                     style: Estilos.legenda,
@@ -130,7 +131,7 @@ class _ImportarNaviTelaState extends State<ImportarNaviTela> {
                       }),
                     ),
                   const SizedBox(height: 16),
-                  const Painel(
+                  Painel(
                     cor: Cores.cartaoClaro,
                     child: Text(
                       'copie os arquivos para o celular (cabo, Drive, e-mail) '
@@ -175,8 +176,8 @@ class _LinhaAnimacao extends StatelessWidget {
     final tem = importada || embutida;
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(
-        tem ? Icons.check_circle : Icons.radio_button_unchecked,
+      leading: IconeCodice(
+        tem ? Ic.checkCirculo : Ic.circulo,
         color: tem ? Cores.verde : Cores.textoFraco,
       ),
       title: Text(gesto.titulo),
@@ -187,7 +188,7 @@ class _LinhaAnimacao extends StatelessWidget {
           ? IconButton(
               tooltip: 'remover',
               onPressed: ocupado ? null : aoRemover,
-              icon: const Icon(Icons.delete_outline),
+              icon: const IconeCodice(Ic.apagar),
             )
           : TextButton(
               onPressed: ocupado ? null : aoImportar,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/views/diario/pagina_diario.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// Rodapé fixo, fora da rolagem: guardar e apagar sempre à mão.
 class RodapeDiario extends StatelessWidget {
@@ -63,9 +64,9 @@ class RodapeDiario extends StatelessWidget {
               shape: const CircleBorder(),
               backgroundColor: Cores.roxoFundo,
               foregroundColor: Cores.roxo,
-              side: const BorderSide(color: Cores.bordaRoxa),
+              side: BorderSide(color: Cores.bordaRoxa),
             ),
-            child: const Icon(Icons.delete_outline, size: 20),
+            child: const IconeCodice(Ic.apagar, size: 20),
           ),
         ],
       ),

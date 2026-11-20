@@ -26,3 +26,4 @@ assets/navi_local/*
 
 # Configuração local do Claude Code.
 .claude/
+test/capturas/saida/

@@ -8,6 +8,8 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/cartao_lista.dart';
+import 'package:codice_app/widgets/icones.dart';
+import 'package:codice_app/widgets/linha_do_tempo.dart';
 
 class LugarTela extends StatelessWidget {
   final Lugar lugar;
@@ -50,15 +52,18 @@ class LugarTela extends StatelessWidget {
               ),
             )
           else
-            for (final f in fatos.take(20))
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: CartaoLista(
-                  icone: _iconeDoFato(f.tipo),
-                  titulo: narrar(f, nome),
-                  subtitulo: cidade.quando(f.quandoSegundos),
-                ),
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+              child: LinhaDoTempo([
+                for (final f in fatos.take(20))
+                  ItemTempo(
+                    icone: iconeDoFato(f.tipo),
+                    texto: narrar(f, nome),
+                    quando: cidade.quando(f.quandoSegundos),
+                    cor: Cores.roxo,
+                  ),
+              ]),
+            ),
           const SizedBox(height: 20),
         ],
       ),
@@ -66,12 +71,12 @@ class LugarTela extends StatelessWidget {
   }
 }
 
-IconData _iconeDoFato(String tipo) => switch (tipo) {
-  'conheceu' => Icons.waving_hand_outlined,
-  'conversou' => Icons.chat_bubble_outline_rounded,
-  'recusou' => Icons.block_outlined,
-  'mudou_tom' => Icons.favorite_border_rounded,
-  'partiu' => Icons.directions_walk,
-  'chegou' || 'entrou' => Icons.place_outlined,
-  _ => Icons.circle_outlined,
+Ic iconeDoFato(String tipo) => switch (tipo) {
+  'conheceu' => Ic.acenar,
+  'conversou' => Ic.conversa,
+  'recusou' => Ic.bloquear,
+  'mudou_tom' => Ic.coracao,
+  'partiu' => Ic.caminhar,
+  'chegou' || 'entrou' => Ic.lugar,
+  _ => Ic.circulo,
 };

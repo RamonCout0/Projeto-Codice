@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/controllers/estado_codice.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/models/humor.dart';
@@ -6,9 +7,10 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/views/diario/humor_visual.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/basicos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 /// A NAVI no topo do Diário: rosto tocável, balão de fala e a barra
-/// de conhecimento "rumo aos 14".
+/// de crescimento "rumo ao próximo aniversário".
 class NaviQueLe extends StatelessWidget {
   final Humor humor;
   final String fala;
@@ -33,7 +35,7 @@ class NaviQueLe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const legenda = TextStyle(color: Color(0xFF8D879B), fontSize: 11);
+    final legenda = TextStyle(color: Cores.textoApagado, fontSize: 12);
     return Column(
       children: [
         Row(
@@ -66,7 +68,7 @@ class NaviQueLe extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            const Flexible(
+            Flexible(
               child: Text(
                 'toque · dois toques · segure',
                 maxLines: 1,
@@ -77,7 +79,12 @@ class NaviQueLe extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(child: BarraProgresso(conhecimento, altura: 4)),
             const SizedBox(width: 6),
-            const Text('rumo aos 14', style: legenda),
+            Text(
+              context.watch<EstadoCodice>().idade >= EstadoCodice.idadeMaxima
+                  ? 'adulta'
+                  : 'rumo aos ${context.watch<EstadoCodice>().idade + 1}',
+              style: legenda,
+            ),
           ],
         ),
       ],
@@ -99,10 +106,10 @@ class NaviQueLe extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(humor.icone, color: humor.cor, size: 12),
+              IconeCodice(humor.icone, color: humor.cor, size: 12),
               const SizedBox(width: 5),
               Text(
-                '${context.watch<Sessao>().perfil.nome} · 8 anos',
+                '${context.watch<Sessao>().perfil.nome} · ${context.watch<EstadoCodice>().idade} anos',
                 style: TextStyle(
                   color: Cores.textoSecundario,
                   fontSize: 11,
@@ -113,14 +120,14 @@ class NaviQueLe extends StatelessWidget {
               if (carinhos > 0)
                 Text(
                   '♥ $carinhos',
-                  style: const TextStyle(color: Cores.rosa, fontSize: 11),
+                  style: TextStyle(color: Cores.rosa, fontSize: 11),
                 ),
             ],
           ),
           const SizedBox(height: 5),
           Text(
             fala,
-            style: const TextStyle(
+            style: TextStyle(
               color: Cores.texto,
               fontSize: 13,
               height: 1.3,

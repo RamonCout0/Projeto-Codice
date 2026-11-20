@@ -14,6 +14,7 @@ import 'package:codice_app/views/conversa/partes_conversa.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/basicos.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 class ConversaTela extends StatefulWidget {
   const ConversaTela({super.key});
@@ -174,7 +175,7 @@ class _ConversaTelaState extends State<ConversaTela> {
       _fila = '';
       _mensagens.remove(resposta);
       _humor = Humor.confusa;
-      if (mounted) avisar(context, '$erro', icone: Icons.wifi_off);
+      if (mounted) avisar(context, '$erro', icone: Ic.wifiOff);
     }
     if (mounted) {
       setState(() {
@@ -219,7 +220,7 @@ class _ConversaTelaState extends State<ConversaTela> {
                 ),
               ),
               // O busto some aos poucos em vez de terminar num corte reto.
-              const Positioned(
+              Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
@@ -230,7 +231,7 @@ class _ConversaTelaState extends State<ConversaTela> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Color(0x000E0D15), Cores.fundo],
+                        colors: [Cores.fundo.withValues(alpha: 0), Cores.fundo],
                       ),
                     ),
                   ),
@@ -241,7 +242,7 @@ class _ConversaTelaState extends State<ConversaTela> {
                 top: 4,
                 child: Pilula(
                   modelo,
-                  icone: Icons.memory,
+                  icone: Ic.chip,
                   cor: Cores.verde,
                   fundo: Cores.verdeFundo,
                   borda: null,

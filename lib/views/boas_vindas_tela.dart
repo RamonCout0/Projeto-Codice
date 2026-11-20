@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
 import 'package:codice_app/controllers/sessao.dart';
-import 'package:codice_app/tema/cores.dart';
-import 'package:codice_app/widgets/avatar_navi.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:codice_app/models/humor.dart';
+import 'package:codice_app/models/perfil_navi.dart';
+import 'package:codice_app/tema/estilos.dart';
+import 'package:codice_app/widgets/ambiente.dart';
+import 'package:codice_app/widgets/foto_navi.dart';
+import 'package:codice_app/widgets/icones.dart';
 import 'package:codice_app/widgets/basicos.dart';
 
 class BoasVindasTela extends StatefulWidget {
@@ -23,7 +28,7 @@ class _BoasVindasTelaState extends State<BoasVindasTela> {
       avisar(
         context,
         'sessão recuperada do armazenamento seguro',
-        icone: Icons.lock_outline,
+        icone: Ic.cadeado,
       );
       Navigator.of(context).pushReplacementNamed(Rotas.app);
     });
@@ -37,146 +42,77 @@ class _BoasVindasTelaState extends State<BoasVindasTela> {
   @override
   Widget build(BuildContext context) {
     final sessao = context.watch<Sessao>();
-    final cor = sessao.perfil.elemento.cor;
+    final cyber = Elemento.cyber.cor;
     return Scaffold(
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -0.35),
-            radius: 0.9,
-            colors: [Color(0xFF1E1934), Cores.fundo],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(22, 36, 22, 24),
-            child: Column(
-              children: [
-                const _Logo(),
-                const SizedBox(height: 10),
-                const Text(
-                  'Códice',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 38,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
+      body: Stack(
+        children: [
+          const Positioned.fill(child: FundoAmbiente()),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+              child: Column(
+                children: [
+                  SvgPicture.asset('assets/arte/logo.svg', width: 88, height: 88),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Códice',
+                    style: Estilos.titulo.copyWith(fontSize: 44, letterSpacing: -1.2),
                   ),
-                ),
-                const SizedBox(height: 2),
-                const Text(
-                  'Nuvem Assistencial de Visualização Interativa',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Cores.textoApagado, fontSize: 12),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: cor.withValues(alpha: 0.8), width: 1.5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: cor.withValues(alpha: 0.28),
-                        blurRadius: 40,
-                        spreadRadius: 4,
-                      ),
-                    ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'Nuvem Assistencial de Visualização Interativa',
+                    textAlign: TextAlign.center,
+                    style: Estilos.legenda.copyWith(fontSize: 12.5),
                   ),
-                  child: const AvatarNavi(largura: 150, altura: 150, redondo: true),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.circle, size: 8, color: Cores.turquesa),
-                    const SizedBox(width: 6),
-                    const Text(
-                      'IRIS · guia',
-                      style: TextStyle(
-                        color: Cores.turquesa,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'um diário onde uma criatura digital\naprende com a convivência.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Cores.textoSuave, fontSize: 13, height: 1.45),
-                ),
-                const Spacer(flex: 2),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  child: sessao.restaurando
-                      ? const Padding(
-                          padding: EdgeInsets.only(bottom: 40),
-                          child: SizedBox.square(
-                            dimension: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                  const Spacer(),
+                  // A Iris, GM da cidade, recebe quem chega.
+                  FotoNavi(cor: cyber, gm: true, tamanho: 176, redonda: true, humor: Humor.feliz),
+                  const SizedBox(height: 18),
+                  Pilula(
+                    'IRIS · GM da cidade',
+                    icone: Ic.gm,
+                    cor: cyber,
+                    fundo: cyber.withValues(alpha: 0.12),
+                    borda: cyber.withValues(alpha: 0.4),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'um diário onde uma criatura digital\naprende com a convivência.',
+                    textAlign: TextAlign.center,
+                    style: Estilos.corpoSuave.copyWith(height: 1.5),
+                  ),
+                  const Spacer(flex: 2),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: sessao.restaurando
+                        ? const Padding(
+                            padding: EdgeInsets.only(bottom: 40),
+                            child: SizedBox.square(
+                              dimension: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : Column(
+                            key: const ValueKey('botoes'),
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => _abrirSessao(criarConta: true),
+                                child: const Text('criar meu NAVI'),
+                              ),
+                              const SizedBox(height: 10),
+                              OutlinedButton(
+                                onPressed: () => _abrirSessao(criarConta: false),
+                                child: const Text('já tenho um códice'),
+                              ),
+                            ],
                           ),
-                        )
-                      : Column(
-                          key: const ValueKey('botoes'),
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => _abrirSessao(criarConta: true),
-                              child: const Text('criar meu NAVI'),
-                            ),
-                            const SizedBox(height: 10),
-                            OutlinedButton(
-                              onPressed: () => _abrirSessao(criarConta: false),
-                              child: const Text('já tenho um códice'),
-                            ),
-                          ],
-                        ),
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Ícone do Códice: um caderno com um marcador.
-class _Logo extends StatelessWidget {
-  const _Logo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 52,
-      height: 52,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Cores.roxoClaro, Cores.roxoProfundo],
-        ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Cores.roxo.withValues(alpha: 0.35),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
         ],
-      ),
-      child: Container(
-        width: 20,
-        height: 29,
-        alignment: const Alignment(0.5, -0.5),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1B1725),
-          borderRadius: BorderRadius.circular(3),
-        ),
-        child: Container(width: 3, height: 8, color: Cores.roxo),
       ),
     );
   }

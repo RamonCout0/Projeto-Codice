@@ -9,6 +9,7 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 class BotaoMenu extends StatelessWidget {
   const BotaoMenu({super.key});
@@ -18,7 +19,7 @@ class BotaoMenu extends StatelessWidget {
     return IconButton(
       tooltip: 'abrir menu',
       onPressed: () => Scaffold.of(context).openDrawer(),
-      icon: const Icon(Icons.menu_rounded, size: 24, color: Cores.textoSuave),
+      icon: IconeCodice(Ic.menu, size: 24, color: Cores.textoSuave),
     );
   }
 }
@@ -36,7 +37,7 @@ class MenuLateral extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.auto_stories_outlined, color: Cores.roxo),
+        icon: IconeCodice(Ic.livroAberto, color: Cores.roxo),
         title: const Text('Códice'),
         content: const Text(
           'Um diário pessoal onde uma criatura digital aprende com a '
@@ -123,25 +124,25 @@ class MenuLateral extends StatelessWidget {
             const Divider(height: 1),
             const SizedBox(height: 8),
             _Item(
-              icone: Icons.psychology_outlined,
+              icone: Ic.navi,
               titulo: 'Personalidade',
               subtitulo: 'nome, elemento e jeito de ser',
               onTap: () => _abrir(context, Rotas.perfil),
             ),
             _Item(
-              icone: Icons.view_in_ar_outlined,
+              icone: Ic.cubo,
               titulo: 'Importar NAVI',
               subtitulo: 'modelo 3D (.vrm) e animações',
               onTap: () => _abrir(context, Rotas.importar),
             ),
             _Item(
-              icone: Icons.settings_outlined,
+              icone: Ic.config,
               titulo: 'Configurações',
-              subtitulo: 'conversa, avisos e cidade',
+              subtitulo: 'aparência, conversa e cidade',
               onTap: () => _abrir(context, Rotas.configuracoes),
             ),
             _Item(
-              icone: Icons.info_outline,
+              icone: Ic.info,
               titulo: 'Sobre',
               subtitulo: 'o que é o Códice',
               onTap: () => _sobre(context),
@@ -149,7 +150,7 @@ class MenuLateral extends StatelessWidget {
             const Spacer(),
             const Divider(height: 1),
             _Item(
-              icone: Icons.logout,
+              icone: Ic.sair,
               titulo: sessao.conectado ? 'Sair da conta' : 'Sair',
               subtitulo: sessao.conectado
                   ? 'esquece a sessão neste aparelho'
@@ -166,25 +167,25 @@ class MenuLateral extends StatelessWidget {
 }
 
 class _Item extends StatelessWidget {
-  final IconData icone;
+  final Ic icone;
   final String titulo;
   final String subtitulo;
   final VoidCallback onTap;
-  final Color cor;
+  final Color? cor;
 
   const _Item({
     required this.icone,
     required this.titulo,
     required this.subtitulo,
     required this.onTap,
-    this.cor = Cores.texto,
+    this.cor,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icone, color: cor, size: 22),
-      title: Text(titulo, style: TextStyle(color: cor, fontSize: 15, fontWeight: FontWeight.w600)),
+      leading: IconeCodice(icone, color: cor ?? Cores.texto, size: 22),
+      title: Text(titulo, style: TextStyle(color: cor ?? Cores.texto, fontSize: 15, fontWeight: FontWeight.w600)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
       subtitle: Text(subtitulo),
       onTap: onTap,

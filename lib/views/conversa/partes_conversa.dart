@@ -5,6 +5,7 @@ import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/basicos.dart';
+import 'package:codice_app/widgets/icones.dart';
 
 const _raioBalao = Radius.circular(15);
 
@@ -57,8 +58,8 @@ class BalaoUsuario extends StatelessWidget {
           ),
           child: Text(
             texto,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Cores.texto,
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
@@ -86,7 +87,7 @@ class CampoMensagem extends StatelessWidget {
   Widget build(BuildContext context) {
     final borda = OutlineInputBorder(
       borderRadius: BorderRadius.circular(25),
-      borderSide: const BorderSide(color: Cores.borda),
+      borderSide: BorderSide(color: Cores.borda),
     );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -104,9 +105,9 @@ class CampoMensagem extends StatelessWidget {
               decoration: InputDecoration(
                 hintText:
                     'escrever para ${context.watch<Sessao>().perfil.nome}...',
-                hintStyle: const TextStyle(color: Color(0xFF898394)),
+                hintStyle: TextStyle(color: Cores.textoFraco),
                 filled: true,
-                fillColor: const Color(0xFF171620),
+                fillColor: Cores.painel,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 18,
                   vertical: 14,
@@ -126,7 +127,7 @@ class CampoMensagem extends StatelessWidget {
               backgroundColor: Cores.roxo,
               foregroundColor: Cores.sobreRoxo,
             ),
-            icon: const Icon(Icons.send_rounded),
+            icon: const IconeCodice(Ic.enviar),
           ),
         ],
       ),

@@ -191,6 +191,11 @@ sem configurar nada). Na tela inicial, **criar meu NAVI** abre o cadastro e
 - [Relatório da atividade](Relatorio_Comunicacao_Segura.pdf)
 - API de exemplo: [api/servidor.mjs](api/servidor.mjs)
 
+## Servidor da NAVICity
+
+A cidade que continua viva com o app fechado roda num servidor próprio, em Go,
+com API de requisições assinadas (Ed25519). Veja [servidor/README.md](servidor/README.md).
+
 ## Além das atividades
 
 Conversa com IA local, NAVI em 3D, animações do Mixamo e 3D na web:

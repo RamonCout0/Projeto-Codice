@@ -1,0 +1,46 @@
+# NAVICity: o servidor da cidade + o ambiente de desenvolvimento Go.
+#   docker compose up -d --build navicity   # liga (ou atualiza) a cidade
+#   docker compose logs -f navicity         # acompanha os fatos ao vivo
+#   ./dgo test ./...                        # Go de desenvolvimento (não sobe com "up")
+services:
+  navicity:
+    build: .
+    image: navicity:dev
+    container_name: navicity
+    environment:
+      TIME_SCALE: ${TIME_SCALE:-1}
+      SEMENTE: ${SEMENTE:-42}
+      # Dentro do container a API escuta em todas as interfaces dele; quem
+      # decide quem alcança é o "ports" abaixo.
+      NAVICITY_ENDERECO: 0.0.0.0:8080
+    # Só no IP do Tailscale, nunca em 0.0.0.0 (só a rede privada alcança a cidade). O IP vem
+    # do .env (TAILSCALE_IP). Sem ele o padrão é loopback: seguro, mas o
+    # celular não alcança. Não use ":?" aqui: o compose interpola o arquivo
+    # inteiro, e isso quebraria também o ./dgo.
+    ports:
+      - "${TAILSCALE_IP:-127.0.0.1}:8080:8080"
+    # Limites pequenos de propósito: o servidor divide RAM e CPU com o
+    # Terraria/tModLoader e outros containers. 5 NAVIs usam poucos MB; o
+    # benchmark vai dizer quanto pedir quando houver milhares.
+    mem_limit: 256m
+    cpus: 1.0
+    restart: unless-stopped
+    stop_grace_period: 10s
+
+
+  go:
+    image: golang:1.27-alpine
+    profiles: ["dev"]          # não sobe com "docker compose up"; só via "run"
+    working_dir: /src
+    user: "1000:1000"          # arquivos criados ficam do inova, não do root
+    volumes:
+      - ./:/src
+    environment:
+      GOCACHE: /src/.cache/go-build   # caches no projeto (fora do Git): sem re-download
+      GOMODCACHE: /src/.cache/mod
+      GOFLAGS: -buildvcs=false        # a imagem alpine não tem git
+      CGO_ENABLED: "0"
+      HOME: /tmp
+      TIME_SCALE: ${TIME_SCALE:-1}
+    mem_limit: 2g
+    restart: unless-stopped

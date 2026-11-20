@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show HandshakeException;
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:codice_app/services/cofre.dart';
 import 'package:http/http.dart' as http;
 import 'package:codice_app/models/perfil_navi.dart';
 
@@ -68,13 +68,13 @@ class NaviDaApi {
 class ApiCodice {
   ApiCodice(
     this.endereco, {
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
+    Cofre storage = const Cofre(),
     http.Client? cliente,
   }) : _storage = storage,
        _cliente = cliente;
 
   final String endereco;
-  final FlutterSecureStorage _storage;
+  final Cofre _storage;
   final http.Client? _cliente;
 
   /// Sem "manter conectado", o token vive só aqui, enquanto o app está

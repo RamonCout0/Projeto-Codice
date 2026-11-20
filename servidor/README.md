@@ -63,6 +63,7 @@ id desconhecido recebem o mesmo `401`.
 | GET | `/saude` | `{"estado":"ok"}` (sem assinatura) |
 | POST | `/navis` | `{"chave_publica":"<base64 de 32 bytes>","perfil":{"elemento":"gelo","tracos":["curiosa","calma"]}}` → `201` com `id`, `apelido`, `area`, `estado`, `areas`. Assinado com a chave enviada. `409` se a chave já existe. |
 | GET | `/cidade` | onde o NAVI está agora, os lugares (`id`, `nome`, `tipo`, `presentes`, `voce`) e o relógio da cidade (`agora_s`) |
+| GET/PUT | `/gm/iris` | configuração da Iris (`tracos` 0 a 100 e `personalidade`, até 800 caracteres). Exige `Authorization: Bearer <NAVICITY_ADMIN_TOKEN>`; sem a variável, a rota fica desligada (404). Os traços valem na hora e ficam em `NAVICITY_DADOS/iris.json`. |
 | GET | `/fatos?desde=N` | `{"fatos":[…],"cursor":N}`: só fatos do NAVI de quem pergunta, do ponto de vista dele |
 
 Tipos de fato: `entrou`, `partiu`, `chegou`, `conheceu`, `conversou`,
@@ -98,3 +99,31 @@ internal/cidade/       liga a simulação ao mundo de fora (uma goroutine só)
 internal/api/          HTTP e assinatura Ed25519
 docs/                  contexto do projeto
 ```
+
+## Configuração da Iris
+
+Só o dono da cidade mexe: defina `NAVICITY_ADMIN_TOKEN` (e `NAVICITY_DADOS`, a
+pasta do `iris.json`) no servidor. No app: **Menu → Iris · GM**, onde a chave é
+pedida uma vez e guardada no aparelho. Os cinco traços mudam o comportamento
+dela na simulação assim que você salva; o texto de personalidade fica gravado
+para a IA narradora usar.
+
+## App web (iPhone e qualquer navegador)
+
+O iPhone roda o Códice pelo navegador: `servidor/web/servir.mjs` entrega o build
+web e repassa só `/api/chat` e `/api/tags` ao Ollama (o navegador não consegue
+falar direto com ele por causa do CORS). A API Go libera o CORS da rede do
+Tailscale; a API de login, as origens de `CODICE_ORIGENS`.
+
+```sh
+flutter build web --release --no-web-resources-cdn \
+  --dart-define=CODICE_API_URL=http://100.x.y.z:8081 \
+  --dart-define=NAVICITY_URL=http://100.x.y.z:8080 \
+  --dart-define=OLLAMA_URL=http://100.x.y.z:8090
+CODICE_WEB_HOST=100.x.y.z node servidor/web/servir.mjs
+```
+
+No Safari do iPhone (com o Tailscale ligado) abra `http://100.x.y.z:8090` e use
+**Compartilhar → Adicionar à Tela de Início**. Limites do navegador: sem
+Bluetooth, e a página HTTP guarda o login no localStorage (não há cofre
+criptografado em HTTP).

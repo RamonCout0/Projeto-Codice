@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:codice_app/services/cofre.dart';
 import 'package:http/http.dart' as http;
 import 'package:codice_app/models/perfil_navi.dart';
 import 'package:codice_app/services/api_codice.dart'
@@ -171,7 +171,7 @@ class ApiNavicity {
   ApiNavicity(
     this.endereco, {
     this.conta = 'local',
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
+    Cofre storage = const Cofre(),
     http.Client? cliente,
     DateTime Function()? agora,
   }) : _storage = storage,
@@ -183,7 +183,7 @@ class ApiNavicity {
   /// Cada conta do app tem a própria identidade (par de chaves) na cidade;
   /// sem conta, vale "local".
   final String conta;
-  final FlutterSecureStorage _storage;
+  final Cofre _storage;
   final http.Client? _cliente;
   final DateTime Function() _agora;
   final Ed25519 _algoritmo = Ed25519();

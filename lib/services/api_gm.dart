@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:codice_app/services/cofre.dart';
 import 'package:http/http.dart' as http;
 import 'package:codice_app/services/api_codice.dart' show FalhaApi, hostDeRedePrivada;
 import 'package:codice_app/services/api_navicity.dart' show enderecoNavicity;
@@ -41,7 +41,7 @@ class ConfigIris {
 class ApiGm {
   ApiGm({
     String? endereco,
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
+    Cofre storage = const Cofre(),
     http.Client? cliente,
   }) : endereco = endereco ?? enderecoNavicity,
        _storage = storage,
@@ -50,7 +50,7 @@ class ApiGm {
   static const _chaveArmazenada = 'navicity.admin';
 
   final String endereco;
-  final FlutterSecureStorage _storage;
+  final Cofre _storage;
   final http.Client? _cliente;
 
   Uri get _base {

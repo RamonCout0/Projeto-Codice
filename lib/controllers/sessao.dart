@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:codice_app/services/cofre.dart';
 import 'package:codice_app/models/perfil_navi.dart';
 import 'package:codice_app/services/api_codice.dart';
 
@@ -13,12 +13,12 @@ import 'package:codice_app/services/api_codice.dart';
 class Sessao extends ChangeNotifier {
   Sessao({
     ApiCodice? api,
-    FlutterSecureStorage storage = const FlutterSecureStorage(),
+    Cofre storage = const Cofre(),
   }) : api = api ?? ApiCodice(enderecoApiCodice),
        _storage = storage;
 
   final ApiCodice api;
-  final FlutterSecureStorage _storage;
+  final Cofre _storage;
   static const _chavePerfil = 'codice.perfil';
 
   PerfilNavi _perfil = PerfilNavi.padrao;

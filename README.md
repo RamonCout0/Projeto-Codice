@@ -214,6 +214,14 @@ Depois do login, o app entra na NAVICity com uma identidade Ed25519 por conta.
 Cidade, lugares, encontros e as novidades da Home vêm dos fatos do servidor;
 as memórias do diário ficam no aparelho e a idade da NAVI cresce com elas.
 
+## No iPhone (e em qualquer navegador)
+
+O build para iOS exige um Mac com Xcode, mas o Códice também roda como **app
+web**: no Safari do iPhone (com o Tailscale ligado), abra o endereço do servidor
+e use **Compartilhar → Adicionar à Tela de Início**. Como publicar o app web e o
+que muda no navegador (sem Bluetooth, login guardado no navegador) está em
+[servidor/README.md](servidor/README.md#app-web-iphone-e-qualquer-navegador).
+
 ## Visual: tema claro, noturno e arte vetorial
 
 - **Aparência:** noturno, claro ou o do aparelho, em **Menu → Configurações**.

@@ -15,11 +15,21 @@ const enderecoApiCodice = String.fromEnvironment(
   defaultValue: 'http://localhost:8080',
 );
 
-/// HTTP sem TLS só é aceito para o próprio aparelho: o tráfego não sai dele.
+/// HTTP sem TLS só é aceito onde o tráfego não passa por rede aberta: o
+/// próprio aparelho (localhost) e a rede privada do Tailscale
+/// (100.64.0.0/10), que já vai criptografada ponta a ponta (WireGuard).
 /// (No emulador Android, `adb reverse tcp:8080 tcp:8080` liga o localhost
 /// do emulador ao do PC.)
-bool _ehLocal(String host) =>
-    host == 'localhost' || host == '127.0.0.1' || host == '::1';
+bool hostDeRedePrivada(String host) {
+  if (host == 'localhost' || host == '127.0.0.1' || host == '::1') return true;
+  final partes = host.split('.');
+  if (partes.length != 4) return false;
+  final n = partes.map(int.tryParse).toList();
+  if (n.any((v) => v == null || v < 0 || v > 255)) return false;
+  return n[0] == 100 && n[1]! >= 64 && n[1]! <= 127;
+}
+
+bool _ehLocal(String host) => hostDeRedePrivada(host);
 
 class FalhaApi implements Exception {
   const FalhaApi(this.mensagem);
@@ -91,7 +101,7 @@ class ApiCodice {
         uri.hasFragment) {
       throw const FalhaApi(
         'Configure CODICE_API_URL com o endereço HTTPS da API '
-        '(HTTP só para localhost).',
+        '(HTTP só para localhost ou para o IP do Tailscale).',
       );
     }
     return uri;
@@ -243,7 +253,8 @@ class ApiCodice {
     } on http.ClientException {
       throw FalhaApi(
         _ehLocal(_base.host)
-            ? 'A API não está rodando. No terminal: node api/servidor.mjs'
+            ? 'A API não está rodando ou não foi alcançada. '
+                  'No servidor: node api/servidor.mjs'
             : 'Servidor indisponível. Confira a conexão e tente novamente.',
       );
     } on FormatException {

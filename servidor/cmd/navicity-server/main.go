@@ -69,10 +69,8 @@ func rodar() error {
 	}
 
 	s := sim.Nova(sim.MapaInicial(), cfg.semente)
-	for _, m := range sim.ElencoDeTeste() {
-		if err := s.AdicionarNavi(m.ID, m.Perfil, m.Area); err != nil {
-			return err
-		}
+	if err := s.Povoar(sim.Residentes()); err != nil {
+		return err
 	}
 	c := cidade.Nova(s, cfg.escala)
 

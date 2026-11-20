@@ -156,13 +156,25 @@ func (c *Cidade) Chave(ctx context.Context, id sim.NaviID) (ed25519.PublicKey, b
 	return k, ok
 }
 
+// AreaVista é um lugar da cidade como o app o enxerga.
+type AreaVista struct {
+	ID        int    `json:"id"`
+	Nome      string `json:"nome"`
+	Tipo      string `json:"tipo"`      // praca, biblioteca ou cafe
+	Presentes int    `json:"presentes"` // quantos NAVIs estão lá agora
+	Voce      bool   `json:"voce"`      // o NAVI de quem pergunta está aqui
+}
+
 // Situacao é onde o NAVI está agora.
 type Situacao struct {
 	ID      sim.NaviID
 	Apelido string
 	Area    string
 	Estado  string
-	Areas   []string
+	Areas   []AreaVista
+	// AgoraSeg é o relógio da cidade (segundos desde o nascimento dela). O
+	// app subtrai o "quando" de cada fato para dizer "há 12 minutos".
+	AgoraSeg int64
 }
 
 func (c *Cidade) situacao(id sim.NaviID) (Situacao, bool) {
@@ -171,9 +183,14 @@ func (c *Cidade) situacao(id sim.NaviID) (Situacao, bool) {
 		return Situacao{}, false
 	}
 	m := c.sim.Mapa()
-	areas := make([]string, m.NumAreas())
+	areas := make([]AreaVista, m.NumAreas())
 	for i := range areas {
-		areas[i] = m.Area(sim.AreaID(i)).Nome
+		a := m.Area(sim.AreaID(i))
+		areas[i] = AreaVista{
+			ID: i, Nome: a.Nome, Tipo: a.Tipo,
+			Presentes: c.sim.Presentes(a.ID),
+			Voce:      n.Estado != sim.Andando && n.Area == a.ID,
+		}
 	}
 	estado := "ocioso"
 	switch n.Estado {
@@ -182,7 +199,7 @@ func (c *Cidade) situacao(id sim.NaviID) (Situacao, bool) {
 	case sim.Conversando:
 		estado = "conversando"
 	}
-	return Situacao{ID: id, Apelido: n.Apelido, Area: m.Area(n.Area).Nome, Estado: estado, Areas: areas}, true
+	return Situacao{ID: id, Apelido: n.Apelido, Area: m.Area(n.Area).Nome, Estado: estado, Areas: areas, AgoraSeg: int64(c.sim.Agora())}, true
 }
 
 func (c *Cidade) Situacao(ctx context.Context, id sim.NaviID) (Situacao, bool) {
@@ -205,7 +222,8 @@ type VistaFato struct {
 	Importancia string `json:"importancia"`
 	Area        string `json:"area"`
 	Destino     string `json:"destino,omitempty"`
-	Outro       string `json:"outro,omitempty"` // apelido do outro NAVI
+	Outro       string `json:"outro,omitempty"`    // apelido do outro NAVI
+	OutroGM     bool   `json:"outro_gm,omitempty"` // o outro é um GM (ex.: Iris)
 	// Lado diz se o NAVI do dono puxou o fato ("origem") ou o sofreu ("alvo").
 	Lado string `json:"lado,omitempty"`
 	// Afinidade e Delta são sempre do ponto de vista do NAVI do dono.
@@ -218,15 +236,16 @@ type VistaFato struct {
 // limite. O app guarda o maior Seq recebido e pede "desde" ele da próxima vez.
 // ProximoCursor é o Seq do último fato VISTO na varredura (mesmo os que não
 // interessam ao NAVI), para o app não reler o mesmo trecho à toa.
-func (c *Cidade) Fatos(ctx context.Context, id sim.NaviID, desde uint64, limite int) (vistos []VistaFato, proximoCursor uint64, err error) {
+func (c *Cidade) Fatos(ctx context.Context, id sim.NaviID, desde uint64, limite int) (vistos []VistaFato, proximoCursor uint64, agoraSeg int64, err error) {
 	proximoCursor = desde
 	err = c.faz(ctx, func() {
+		agoraSeg = int64(c.sim.Agora())
 		m := c.sim.Mapa()
-		apelido := func(o sim.NaviID) string {
+		apelido := func(o sim.NaviID) (string, bool) {
 			if n, ok := c.sim.Navi(o); ok {
-				return n.Apelido
+				return n.Apelido, n.GM
 			}
-			return ""
+			return "", false
 		}
 		for _, f := range c.fatos {
 			if f.Seq <= desde {
@@ -242,10 +261,10 @@ func (c *Cidade) Fatos(ctx context.Context, id sim.NaviID, desde uint64, limite 
 			}
 		}
 	})
-	return vistos, proximoCursor, err
+	return vistos, proximoCursor, agoraSeg, err
 }
 
-func vista(f sim.Fato, eu sim.NaviID, m *sim.Mapa, apelido func(sim.NaviID) string) (VistaFato, bool) {
+func vista(f sim.Fato, eu sim.NaviID, m *sim.Mapa, quem func(sim.NaviID) (string, bool)) (VistaFato, bool) {
 	sou := func(a sim.NaviID) bool { return a == eu }
 	if !sou(f.Navi) && !sou(f.Outro) {
 		return VistaFato{}, false
@@ -259,10 +278,10 @@ func vista(f sim.Fato, eu sim.NaviID, m *sim.Mapa, apelido func(sim.NaviID) stri
 	origem := sou(f.Navi)
 	if origem {
 		v.Lado = "origem"
-		v.Outro = apelido(f.Outro)
+		v.Outro, v.OutroGM = quem(f.Outro)
 	} else {
 		v.Lado = "alvo"
-		v.Outro = apelido(f.Navi)
+		v.Outro, v.OutroGM = quem(f.Navi)
 	}
 	inteiro := func(x int) *int { return &x }
 
@@ -271,12 +290,12 @@ func vista(f sim.Fato, eu sim.NaviID, m *sim.Mapa, apelido func(sim.NaviID) stri
 		if !origem {
 			return VistaFato{}, false
 		}
-		v.Tipo, v.Outro, v.Lado = map[sim.TipoFato]string{sim.FatoEntrou: "entrou", sim.FatoChegou: "chegou"}[f.Tipo], "", ""
+		v.Tipo, v.Outro, v.OutroGM, v.Lado = map[sim.TipoFato]string{sim.FatoEntrou: "entrou", sim.FatoChegou: "chegou"}[f.Tipo], "", false, ""
 	case sim.FatoPartiu:
 		if !origem {
 			return VistaFato{}, false
 		}
-		v.Tipo, v.Outro, v.Lado = "partiu", "", ""
+		v.Tipo, v.Outro, v.OutroGM, v.Lado = "partiu", "", false, ""
 		v.Destino = m.Area(f.Destino).Nome
 	case sim.FatoConheceu, sim.FatoConversou:
 		v.Tipo = map[sim.TipoFato]string{sim.FatoConheceu: "conheceu", sim.FatoConversou: "conversou"}[f.Tipo]

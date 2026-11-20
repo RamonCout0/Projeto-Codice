@@ -62,21 +62,26 @@ id desconhecido recebem o mesmo `401`.
 | --- | --- | --- |
 | GET | `/saude` | `{"estado":"ok"}` (sem assinatura) |
 | POST | `/navis` | `{"chave_publica":"<base64 de 32 bytes>","perfil":{"elemento":"gelo","tracos":["curiosa","calma"]}}` → `201` com `id`, `apelido`, `area`, `estado`, `areas`. Assinado com a chave enviada. `409` se a chave já existe. |
-| GET | `/cidade` | onde o NAVI está agora |
+| GET | `/cidade` | onde o NAVI está agora, os lugares (`id`, `nome`, `tipo`, `presentes`, `voce`) e o relógio da cidade (`agora_s`) |
 | GET | `/fatos?desde=N` | `{"fatos":[…],"cursor":N}`: só fatos do NAVI de quem pergunta, do ponto de vista dele |
 
 Tipos de fato: `entrou`, `partiu`, `chegou`, `conheceu`, `conversou`,
-`recusou`, `mudou_tom`. O app guarda o `cursor` e o envia como `desde` na
-próxima consulta.
+`recusou`, `mudou_tom`. Cada fato traz `quando_s` (segundos desde o
+nascimento da cidade) e a resposta traz `agora_s`, para o app dizer "há 12
+minutos". Quando o outro NAVI é um GM vem `outro_gm: true`. O app guarda o
+`cursor` e o envia como `desde` na próxima consulta.
 
 ## Perfil do app → cidade
 
 O app descreve o NAVI com um elemento e de 1 a 3 traços em texto. A cidade
 precisa de números, então a tradução fica em `internal/dominio/perfil_app.go`:
 
-- **Elemento:** vira a fatia dominante (60%) de uma roleta de 9 elementos.
-  `eletrico` vira `raio`. `luz` e `sombra` ficam fora do anel de vantagens
-  (água→fogo→gelo→ar→terra→raio): são neutros, como `normal`.
+- **Elemento:** vira a fatia dominante (60%) de uma roleta de 10 elementos.
+  `eletrico` vira `raio`. `luz`, `sombra` e `cyber` ficam fora do anel de
+  vantagens (água→fogo→gelo→ar→terra→raio): são neutros, como `normal`.
+- **Cyber é só dos GMs.** Nenhum jogador escolhe: o registro recusa (`400`).
+  A **Iris**, game master da cidade, é um NAVI da casa de elemento Cyber que
+  mora na Biblioteca Velha; o app a mostra com o selo `GM`.
 - **Traços:** cada um desloca os 5 números (coragem, curiosidade, paciência,
   sociabilidade, agressividade), que partem de 50.
 - **Afinidade:** o primeiro encontro de um par usa uma fórmula simétrica; depois

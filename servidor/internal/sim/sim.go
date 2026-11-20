@@ -60,6 +60,24 @@ func (s *Sim) Navi(id NaviID) (*Navi, bool) {
 // AdicionarNavi coloca um NAVI na cidade. Valida o perfil porque, no futuro,
 // ele chega pela rede vindo do app.
 func (s *Sim) AdicionarNavi(id NaviID, p dominio.Perfil, area AreaID) error {
+	return s.adicionar(id, Apelido(id), false, p, area)
+}
+
+// AdicionarGM coloca um game master na cidade, com apelido próprio (ex.:
+// "Iris") em vez do derivado do id.
+func (s *Sim) AdicionarGM(id NaviID, apelido string, p dominio.Perfil, area AreaID) error {
+	return s.adicionar(id, apelido, true, p, area)
+}
+
+// Presentes diz quantos NAVIs estão parados numa área agora.
+func (s *Sim) Presentes(a AreaID) int {
+	if !s.mapa.valida(a) {
+		return 0
+	}
+	return len(s.presentes[a])
+}
+
+func (s *Sim) adicionar(id NaviID, apelido string, gm bool, p dominio.Perfil, area AreaID) error {
 	if err := p.Validar(); err != nil {
 		return fmt.Errorf("NAVI %d: %w", id, err)
 	}
@@ -71,7 +89,8 @@ func (s *Sim) AdicionarNavi(id NaviID, p dominio.Perfil, area AreaID) error {
 	}
 	n := &Navi{
 		ID:       id,
-		Apelido:  Apelido(id),
+		Apelido:  apelido,
+		GM:       gm,
 		Perfil:   p,
 		Area:     area,
 		Estado:   Ocioso,

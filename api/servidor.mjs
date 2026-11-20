@@ -11,7 +11,10 @@ import { promisify } from 'node:util';
 // Nada é obrigatório: `node api/servidor.mjs` já sobe a API.
 //   CODICE_DADOS       pasta das contas e do segredo (padrão: api/dados)
 //   CODICE_JWT_SECRET  segredo do JWT; sem ele, um é gerado e guardado
-//   CODICE_TOKEN_TTL   duração do token em segundos (padrão 900)
+//   CODICE_TOKEN_TTL   duração do token em segundos (padrão 900, máximo 30 dias)
+//   CODICE_HOST        endereço de escuta (padrão 127.0.0.1)
+//   CODICE_REDE_PRIVADA=1  sem TLS, permite escutar no IP do Tailscale
+//                      (100.64.0.0/10): a rede já é criptografada ponta a ponta
 //   CODICE_SENHA       opcional: cria/atualiza a conta de demonstração "aluno"
 //   CODICE_ORIGENS     origens extras do app web liberadas no CORS (vírgula)
 
@@ -20,8 +23,9 @@ const pastaDados = process.env.CODICE_DADOS ??
 mkdirSync(pastaDados, { recursive: true });
 
 const ttl = Number(process.env.CODICE_TOKEN_TTL ?? 900);
-if (!Number.isSafeInteger(ttl) || ttl < 1 || ttl > 3600) {
-  throw new Error('CODICE_TOKEN_TTL precisa ficar entre 1 e 3600 segundos.');
+const TTL_MAXIMO = 30 * 24 * 3600;
+if (!Number.isSafeInteger(ttl) || ttl < 1 || ttl > TTL_MAXIMO) {
+  throw new Error(`CODICE_TOKEN_TTL precisa ficar entre 1 e ${TTL_MAXIMO} segundos.`);
 }
 
 function lerSegredo() {
@@ -294,8 +298,17 @@ function iniciarServidor() {
     : createServer(atender);
 
   const host = process.env.CODICE_HOST ?? '127.0.0.1';
-  if (!certificado && host !== '127.0.0.1' && host !== '::1') {
-    throw new Error('Sem TLS, a API só pode ouvir no endereço local.');
+  const local = host === '127.0.0.1' || host === '::1';
+  // Tailscale usa 100.64.0.0/10 (100.64.x.x a 100.127.x.x). O tráfego entre
+  // os aparelhos da rede já vai criptografado (WireGuard), então HTTP puro
+  // ali não expõe a senha, desde que a pessoa peça isso explicitamente.
+  const emTailscale = /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}$/.test(host);
+  const redePrivada = process.env.CODICE_REDE_PRIVADA === '1' && emTailscale;
+  if (!certificado && !local && !redePrivada) {
+    throw new Error(
+      'Sem TLS, a API só pode ouvir no endereço local (ou no IP do Tailscale ' +
+        'com CODICE_REDE_PRIVADA=1).',
+    );
   }
   servidor.listen(Number(process.env.PORT ?? 8080), host, () => {
     const { port } = servidor.address();

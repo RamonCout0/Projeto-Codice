@@ -30,6 +30,10 @@ func elementoDoApp(nome string) (Elemento, error) {
 	if e == Normal {
 		return 0, fmt.Errorf("elemento desconhecido: %q", nome)
 	}
+	// Cyber é só dos GMs: um cliente comum nunca pode se declarar GM.
+	if e == Cyber {
+		return 0, fmt.Errorf("elemento reservado: %q", nome)
+	}
 	return e, nil
 }
 
@@ -89,5 +93,19 @@ func PerfilDoApp(elemento string, tracos []string) (Perfil, error) {
 	r[el] = dominanteDoApp
 
 	p := Perfil{Roleta: r, Tracos: t}
+	return p, p.Validar()
+}
+
+// PerfilGM monta o perfil de um GM (como a Iris): elemento Cyber dominante
+// (80%) e traços dados direto, sem passar pela tradução do app, porque GMs
+// são criados pelo servidor, nunca por um cliente.
+func PerfilGM(tracos Tracos) (Perfil, error) {
+	var r Roleta
+	resto := 20.0 / float64(NumElementos-1)
+	for i := range r {
+		r[i] = resto
+	}
+	r[Cyber] = 80
+	p := Perfil{Roleta: r, Tracos: tracos}
 	return p, p.Validar()
 }

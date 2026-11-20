@@ -9,6 +9,9 @@ type AreaID uint16
 type Area struct {
 	ID   AreaID
 	Nome string
+	// Tipo é o identificador estável do lugar ("praca", "biblioteca",
+	// "cafe"). O app escolhe o desenho pelo tipo, não pelo nome.
+	Tipo string
 }
 
 // Ligacao é uma passagem de mão única; Ligar cria as duas direções.
@@ -26,9 +29,11 @@ type Mapa struct {
 
 func NovoMapa() *Mapa { return &Mapa{} }
 
-func (m *Mapa) AdicionarArea(nome string) AreaID {
+func (m *Mapa) AdicionarArea(nome string) AreaID { return m.AdicionarAreaDoTipo(nome, "") }
+
+func (m *Mapa) AdicionarAreaDoTipo(nome, tipo string) AreaID {
 	id := AreaID(len(m.areas))
-	m.areas = append(m.areas, Area{ID: id, Nome: nome})
+	m.areas = append(m.areas, Area{ID: id, Nome: nome, Tipo: tipo})
 	m.ligacoes = append(m.ligacoes, nil)
 	return id
 }
@@ -62,9 +67,9 @@ const (
 // MapaInicial é a cidade que o app já mostra mockada.
 func MapaInicial() *Mapa {
 	m := NovoMapa()
-	m.AdicionarArea("Praça dos Bipes")
-	m.AdicionarArea("Biblioteca Velha")
-	m.AdicionarArea("Café da Esquina")
+	m.AdicionarAreaDoTipo("Praça dos Bipes", "praca")
+	m.AdicionarAreaDoTipo("Biblioteca Velha", "biblioteca")
+	m.AdicionarAreaDoTipo("Café da Esquina", "cafe")
 	// Erros aqui seriam bug no próprio código, não entrada externa: por isso
 	// o panic é aceitável (falha alto e cedo, na inicialização).
 	for _, l := range []struct {

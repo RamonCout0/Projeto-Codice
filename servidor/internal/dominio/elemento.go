@@ -25,14 +25,18 @@ const (
 	// e ficam fora do anel: são neutros, como Normal.
 	Luz
 	Sombra
+	// Cyber é o elemento exclusivo dos GMs (como a Iris). Nenhum jogador
+	// escolhe: o registro pela API recusa (ver PerfilDoApp). Fica no fim do
+	// enum de propósito, e fora do anel, como os outros neutros.
+	Cyber
 
-	NumElementos = int(Sombra) + 1
+	NumElementos = int(Cyber) + 1
 )
 
 // Nomes iguais ao `.name` do Dart, usados no JSON trocado com o app.
-var nomesElemento = [NumElementos]string{"agua", "fogo", "gelo", "ar", "terra", "raio", "normal", "luz", "sombra"}
+var nomesElemento = [NumElementos]string{"agua", "fogo", "gelo", "ar", "terra", "raio", "normal", "luz", "sombra", "cyber"}
 
-var rotulosElemento = [NumElementos]string{"Água", "Fogo", "Gelo", "Ar", "Terra", "Raio", "Normal", "Luz", "Sombra"}
+var rotulosElemento = [NumElementos]string{"Água", "Fogo", "Gelo", "Ar", "Terra", "Raio", "Normal", "Luz", "Sombra", "Cyber"}
 
 // Valido diz se o número cabe no enum. Tudo que vem de fora (rede, banco)
 // passa por aqui antes de virar índice de array.

@@ -82,7 +82,10 @@ func (r Relacao) AfinidadeEm(agora Instante) float64 {
 type Navi struct {
 	ID      NaviID
 	Apelido string
-	Perfil  dominio.Perfil
+	// GM marca os game masters (como a Iris): NAVIs da casa, de elemento
+	// Cyber, que o app mostra com um selo próprio.
+	GM     bool
+	Perfil dominio.Perfil
 
 	Area    AreaID // onde está (ou de onde saiu, se Andando)
 	Destino AreaID // só vale se Andando

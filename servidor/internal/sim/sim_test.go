@@ -213,3 +213,29 @@ func TestDeltaTemRetornoDecrescente(t *testing.T) {
 		t.Fatalf("-10 em 10 = %.1f, esperado 8", got)
 	}
 }
+
+func TestIrisEhGMDaBiblioteca(t *testing.T) {
+	s := Nova(MapaInicial(), 1)
+	if err := s.Povoar(Residentes()); err != nil {
+		t.Fatal(err)
+	}
+	iris, ok := s.Navi(IDIris)
+	if !ok || !iris.GM || iris.Apelido != "Iris" || iris.Area != Biblioteca {
+		t.Fatalf("Iris mal configurada: %+v", iris)
+	}
+	if iris.Perfil.Roleta.Dominante() != dominio.Cyber {
+		t.Fatal("a GM é de elemento Cyber")
+	}
+	if got := s.Presentes(Biblioteca); got < 1 {
+		t.Fatalf("a Biblioteca deveria ter ao menos a Iris, tem %d", got)
+	}
+	// A cidade com a GM continua determinística.
+	a := Nova(MapaInicial(), 7)
+	b := Nova(MapaInicial(), 7)
+	_ = a.Povoar(Residentes())
+	_ = b.Povoar(Residentes())
+	fa, fb := a.Avancar(3*Dia), b.Avancar(3*Dia)
+	if len(fa) == 0 || len(fa) != len(fb) {
+		t.Fatalf("mesma semente deveria dar os mesmos fatos: %d x %d", len(fa), len(fb))
+	}
+}

@@ -199,3 +199,38 @@ func TestSemAssinaturaNaoPassa(t *testing.T) {
 		t.Fatalf("deveria dar 401, deu %d", resp.StatusCode)
 	}
 }
+
+func TestCidadeTrazAreasEOReloginho(t *testing.T) {
+	a := novoAmbiente(t)
+	c := novoCliente(t)
+	_, corpo := a.registrar(c)
+	c.id = itoa(int64(corpo["id"].(float64)))
+
+	status, cid := a.enviar(a.pedido(c, "GET", "/cidade", nil))
+	if status != http.StatusOK {
+		t.Fatalf("/cidade: %d", status)
+	}
+	areas, ok := cid["areas"].([]any)
+	if !ok || len(areas) != 3 {
+		t.Fatalf("esperava 3 áreas, veio %v", cid["areas"])
+	}
+	praca := areas[0].(map[string]any)
+	if praca["tipo"] != "praca" || praca["voce"] != true || praca["presentes"].(float64) < 1 {
+		t.Fatalf("a praça deveria ter o NAVI do dono: %v", praca)
+	}
+	if _, ok := cid["agora_s"].(float64); !ok {
+		t.Fatalf("faltou agora_s: %v", cid)
+	}
+}
+
+func TestClienteNaoRegistraComoGM(t *testing.T) {
+	a := novoAmbiente(t)
+	c := novoCliente(t)
+	corpo, _ := json.Marshal(map[string]any{
+		"chave_publica": base64.StdEncoding.EncodeToString(c.pub),
+		"perfil":        map[string]any{"elemento": "cyber", "tracos": []string{"calma"}},
+	})
+	if status, _ := a.enviar(a.pedido(c, "POST", "/navis", corpo)); status != http.StatusBadRequest {
+		t.Fatalf("cyber deveria dar 400, deu %d", status)
+	}
+}

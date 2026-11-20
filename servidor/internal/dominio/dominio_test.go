@@ -158,3 +158,19 @@ func TestLuzESombraSaoNeutras(t *testing.T) {
 		t.Fatal("nomes de Luz/Sombra devem bater com o enum do app")
 	}
 }
+
+func TestCyberEhReservadoAoGM(t *testing.T) {
+	if _, err := PerfilDoApp("cyber", []string{"calma"}); err == nil {
+		t.Fatal("um cliente comum não pode escolher o elemento dos GMs")
+	}
+	p, err := PerfilGM(Tracos{60, 85, 90, 70, 5})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Roleta.Dominante() != Cyber || !p.Roleta.Especialista() {
+		t.Fatalf("GM deveria ser Cyber especialista, veio %s", p.Roleta.Dominante())
+	}
+	if Vence(Cyber, Fogo) || Vence(Agua, Cyber) {
+		t.Fatal("Cyber fica fora do anel")
+	}
+}

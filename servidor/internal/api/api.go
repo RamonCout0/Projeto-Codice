@@ -20,6 +20,7 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"crypto/sha256"
@@ -28,7 +29,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"bytes"
 	"io"
 	"net"
 	"net/http"
@@ -218,6 +218,7 @@ func jsonSituacao(sit cidade.Situacao) map[string]any {
 		"area":    sit.Area,
 		"estado":  sit.Estado,
 		"areas":   sit.Areas,
+		"agora_s": sit.AgoraSeg,
 	}
 }
 
@@ -240,7 +241,7 @@ func (s *Servidor) fatos(w http.ResponseWriter, r *http.Request, id sim.NaviID) 
 		}
 		desde = n
 	}
-	vistos, cursor, err := s.Cidade.Fatos(r.Context(), id, desde, maxFatosPagina)
+	vistos, cursor, agora, err := s.Cidade.Fatos(r.Context(), id, desde, maxFatosPagina)
 	if err != nil {
 		erroJSON(w, http.StatusServiceUnavailable, "cidade indisponível")
 		return
@@ -248,7 +249,7 @@ func (s *Servidor) fatos(w http.ResponseWriter, r *http.Request, id sim.NaviID) 
 	if vistos == nil {
 		vistos = []cidade.VistaFato{} // [] e não null no JSON
 	}
-	escrever(w, http.StatusOK, map[string]any{"fatos": vistos, "cursor": cursor})
+	escrever(w, http.StatusOK, map[string]any{"fatos": vistos, "cursor": cursor, "agora_s": agora})
 }
 
 // ------------------------------------------------------------------- helpers

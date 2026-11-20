@@ -37,6 +37,14 @@ Future<bool> _assinaturaConfere(http.BaseRequest r, List<int> chavePublica) asyn
   );
 }
 
+/// Resposta em UTF-8, como o servidor real (o padrão do MockClient é Latin-1
+/// e quebra "Praça").
+http.Response _resp(Object corpo, int status) => http.Response.bytes(
+  utf8.encode(jsonEncode(corpo)),
+  status,
+  headers: {'content-type': 'application/json; charset=utf-8'},
+);
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
@@ -65,7 +73,7 @@ void main() {
       });
       expect(pedido.headers['X-Carimbo'], '1800000000');
       expect(await _assinaturaConfere(pedido, chave), isTrue);
-      return http.Response(jsonEncode(_situacao), 201);
+      return _resp(_situacao, 201);
     });
 
     final s = await api.entrar(PerfilNavi.padrao);
@@ -80,13 +88,12 @@ void main() {
         primeira = base64Decode(
           (jsonDecode(pedido.body) as Map)['chave_publica'] as String,
         );
-        return http.Response(jsonEncode(_situacao), 201);
+        return _resp(_situacao, 201);
       }
       expect(pedido.headers['X-Navi'], '42');
       expect(await _assinaturaConfere(pedido, primeira!), isTrue);
       expect(pedido.url.query, 'desde=7');
-      return http.Response(
-        jsonEncode({
+      return _resp({
           'cursor': 9,
           'fatos': [
             {
@@ -101,9 +108,7 @@ void main() {
               'tom': 'indiferente',
             },
           ],
-        }),
-        200,
-      );
+        }, 200);
     });
 
     await api.entrar(PerfilNavi.padrao);
@@ -119,9 +124,9 @@ void main() {
     final api = criar((pedido) async {
       chamadas++;
       if (pedido.method == 'POST') {
-        return http.Response(jsonEncode({'erro': 'esta chave já tem um NAVI'}), 409);
+        return _resp({'erro': 'esta chave já tem um NAVI'}, 409);
       }
-      return http.Response(jsonEncode(_situacao), 200);
+      return _resp(_situacao, 200);
     });
     // Sem id guardado, a consulta falha com mensagem clara, não com erro cru.
     await expectLater(api.entrar(PerfilNavi.padrao), throwsA(isA<FalhaApi>()));
@@ -131,9 +136,9 @@ void main() {
   test('401 vira mensagem sobre o relógio do celular', () async {
     final api = criar((pedido) async {
       if (pedido.method == 'POST') {
-        return http.Response(jsonEncode(_situacao), 201);
+        return _resp(_situacao, 201);
       }
-      return http.Response(jsonEncode({'erro': 'assinatura inválida'}), 401);
+      return _resp({'erro': 'assinatura inválida'}, 401);
     });
     await api.entrar(PerfilNavi.padrao);
     await expectLater(

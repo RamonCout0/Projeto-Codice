@@ -5,7 +5,8 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:codice_app/models/perfil_navi.dart';
-import 'package:codice_app/services/api_codice.dart' show FalhaApi;
+import 'package:codice_app/services/api_codice.dart'
+    show FalhaApi, hostDeRedePrivada;
 
 /// Endereço do servidor da NAVICity (veja servidor/README.md). Na rede
 /// privada (Tailscale) ele é HTTP, porque nenhum segredo trafega: cada pedido
@@ -15,17 +16,6 @@ const enderecoNavicity = String.fromEnvironment(
   'NAVICITY_URL',
   defaultValue: 'http://localhost:8080',
 );
-
-/// HTTP puro só para o próprio aparelho e para a rede do Tailscale
-/// (100.64.0.0/10). Qualquer outro endereço precisa ser HTTPS.
-bool _redePrivada(String host) {
-  if (host == 'localhost' || host == '127.0.0.1' || host == '::1') return true;
-  final partes = host.split('.');
-  if (partes.length != 4) return false;
-  final n = partes.map(int.tryParse).toList();
-  if (n.any((v) => v == null || v < 0 || v > 255)) return false;
-  return n[0] == 100 && n[1]! >= 64 && n[1]! <= 127;
-}
 
 /// Onde o NAVI está na cidade.
 class SituacaoNaCidade {
@@ -148,7 +138,7 @@ class ApiNavicity {
     final seguro =
         uri != null &&
         (uri.scheme == 'https' ||
-            (uri.scheme == 'http' && _redePrivada(uri.host)));
+            (uri.scheme == 'http' && hostDeRedePrivada(uri.host)));
     if (uri == null ||
         !seguro ||
         uri.host.isEmpty ||
@@ -170,7 +160,7 @@ class ApiNavicity {
     try {
       final guardada = await _storage.read(key: _chaveSemente);
       if (guardada != null) {
-        return _algoritmo.newKeyPairFromSeed(base64Decode(guardada));
+        return await _algoritmo.newKeyPairFromSeed(base64Decode(guardada));
       }
       final novo = await _algoritmo.newKeyPair();
       final semente = await novo.extractPrivateKeyBytes();

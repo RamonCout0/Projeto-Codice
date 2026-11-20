@@ -51,7 +51,7 @@ class DetalheNaviTela extends StatelessWidget {
               children: [
                 Text(
                   'afinidade ${atual.afinidade}%',
-                  style: const TextStyle(color: Cores.roxoClaro, fontSize: 11),
+                  style: const TextStyle(color: Cores.roxoClaro, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
                 BarraProgresso(

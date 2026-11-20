@@ -27,7 +27,7 @@ Future<bool?> confirmarGuardar(
             etiquetas.isEmpty
                 ? 'sem etiqueta — vai como "geral".'
                 : 'etiquetas: ${etiquetas.join(', ')}',
-            style: const TextStyle(color: Cores.roxoClaro, fontSize: 11),
+            style: const TextStyle(color: Cores.roxoClaro, fontSize: 12),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -65,7 +65,7 @@ Future<bool?> perguntarContradicao(BuildContext context, Memoria antiga) {
       content: Text(
         'antes você me contou: «${antiga.texto}»\n\n'
         'dois fatos que eu guardo se contradizem.',
-        style: const TextStyle(color: Cores.ambarTexto, fontSize: 12),
+        style: const TextStyle(color: Cores.ambarTexto, fontSize: 13),
       ),
       actions: [
         TextButton(
@@ -168,7 +168,7 @@ class _CartaoMemoria extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '${memoria.etiquetas.join(' · ')}  ·  ${q.day}/${q.month}',
-            style: const TextStyle(color: Cores.roxoClaro, fontSize: 10),
+            style: const TextStyle(color: Cores.roxoClaro, fontSize: 12),
           ),
         ],
       ),

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 
-/// O palco da NAVI: o fundo em degradê com ela de pé, os pés na base, e
-/// um brilho no chão na cor do elemento.
+/// O palco da NAVI: fundo escuro com uma aura na cor do elemento atrás dela,
+/// ela de pé, e um brilho no chão que liga os pés ao palco.
 class PalcoNavi extends StatelessWidget {
   const PalcoNavi({super.key});
 
@@ -13,35 +14,48 @@ class PalcoNavi extends StatelessWidget {
   Widget build(BuildContext context) {
     final cor = context.watch<Sessao>().perfil.elemento.cor;
     return Container(
-      height: 340,
+      height: 380,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: Color.lerp(const Color(0xFF5A4B87), cor, 0.25)!),
-        gradient: RadialGradient(
-          center: const Alignment(0, -0.15),
-          radius: 0.95,
-          colors: [Color.lerp(const Color(0xFF192235), cor, 0.08)!, Cores.palco],
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: Color.lerp(Cores.bordaRoxa, cor, 0.35)!),
+        boxShadow: Efeitos.brilho(cor, forca: 0.14, desfoque: 40),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color.lerp(Cores.palco, cor, 0.1)!, Cores.palco],
         ),
       ),
       child: Stack(
         children: [
-          // Brilho no chão: liga os pés ao palco sem desenhar anéis.
+          // Aura: um círculo suave de luz do elemento atrás do corpo.
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, 0.15),
+                  radius: 0.75,
+                  colors: [cor.withValues(alpha: 0.24), cor.withValues(alpha: 0)],
+                ),
+              ),
+            ),
+          ),
+          // Brilho no chão.
           Positioned(
             left: 0,
             right: 0,
-            bottom: 8,
+            bottom: 12,
             child: Center(
               child: Container(
-                width: 130,
-                height: 12,
+                width: 160,
+                height: 14,
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.elliptical(65, 6)),
+                  borderRadius: const BorderRadius.all(Radius.elliptical(80, 7)),
                   boxShadow: [
                     BoxShadow(
-                      color: cor.withValues(alpha: 0.45),
-                      blurRadius: 22,
-                      spreadRadius: 2,
+                      color: cor.withValues(alpha: 0.55),
+                      blurRadius: 26,
+                      spreadRadius: 3,
                     ),
                   ],
                 ),
@@ -49,8 +63,8 @@ class PalcoNavi extends StatelessWidget {
             ),
           ),
           const Positioned.fill(
-            top: 16,
-            bottom: 10,
+            top: 20,
+            bottom: 14,
             child: AvatarNavi(
               enquadramento: Enquadramento.corpo,
               alinhamento: Alignment.bottomCenter,

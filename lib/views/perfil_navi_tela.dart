@@ -253,7 +253,7 @@ class _CartaoElemento extends StatelessWidget {
                 elemento.titulo,
                 style: TextStyle(
                   color: escolhido ? Colors.white : Cores.textoSecundario,
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: escolhido ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

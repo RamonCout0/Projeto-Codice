@@ -35,7 +35,7 @@ class EtiquetasDiario extends StatelessWidget {
             if (nomes.isEmpty)
               const Text(
                 'aparecem enquanto você escreve',
-                style: TextStyle(color: Cores.textoFraco, fontSize: 10),
+                style: TextStyle(color: Cores.textoFraco, fontSize: 12),
               ),
             for (final nome in nomes)
               _Etiqueta(
@@ -51,7 +51,7 @@ class EtiquetasDiario extends StatelessWidget {
               style: IconButton.styleFrom(
                 backgroundColor: Cores.roxoFundo,
                 foregroundColor: Cores.roxo,
-                side: const BorderSide(color: Color(0xFF493A70)),
+                side: const BorderSide(color: Cores.bordaRoxa),
               ),
               icon: const Icon(Icons.add),
             ),
@@ -99,7 +99,7 @@ class _Etiqueta extends StatelessWidget {
               nome,
               style: TextStyle(
                 color: cor,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 decoration: ativa ? null : TextDecoration.lineThrough,
               ),

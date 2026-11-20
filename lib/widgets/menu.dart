@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 
@@ -14,7 +15,7 @@ class BotaoMenu extends StatelessWidget {
     return IconButton(
       tooltip: 'abrir menu',
       onPressed: () => Scaffold.of(context).openDrawer(),
-      icon: const Icon(Icons.menu, size: 20, color: Color(0xFFC5C1CB)),
+      icon: const Icon(Icons.menu_rounded, size: 24, color: Cores.textoSuave),
     );
   }
 }
@@ -81,11 +82,12 @@ class MenuLateral extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: perfil.elemento.cor),
+                      border: Border.all(color: perfil.elemento.cor, width: 1.5),
+                      boxShadow: Efeitos.brilho(perfil.elemento.cor, forca: 0.3, desfoque: 14),
                     ),
                     child: const AvatarNavi(
-                      largura: 52,
-                      altura: 52,
+                      largura: 60,
+                      altura: 60,
                       redondo: true,
                     ),
                   ),
@@ -102,7 +104,7 @@ class MenuLateral extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           '${perfil.elemento.titulo} · 8 anos · criança',
-                          style: TextStyle(color: perfil.elemento.cor, fontSize: 10),
+                          style: TextStyle(color: perfil.elemento.cor, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                         if (sessao.usuario != null)
                           Text('@${sessao.usuario}', style: Estilos.legenda),
@@ -175,8 +177,9 @@ class _Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icone, color: cor, size: 20),
-      title: Text(titulo, style: TextStyle(color: cor, fontSize: 13)),
+      leading: Icon(icone, color: cor, size: 22),
+      title: Text(titulo, style: TextStyle(color: cor, fontSize: 15, fontWeight: FontWeight.w600)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
       subtitle: Text(subtitulo),
       onTap: onTap,
     );

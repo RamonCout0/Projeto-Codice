@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
 
 /// Item de lista em cartão: ícone num quadrado tingido, título e detalhe.
@@ -21,28 +22,32 @@ class CartaoLista extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Cores.cartao,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: Efeitos.volume(Cores.cartao),
         borderRadius: BorderRadius.circular(Estilos.raio),
-        side: const BorderSide(color: Cores.borda),
+        border: Border.all(color: Cores.borda),
+        boxShadow: Efeitos.sombraCartao,
       ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: BorderRadius.circular(Estilos.raio),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
+          padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: corIcone.withValues(alpha: 0.13),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(15),
                   border: Border.all(color: corIcone.withValues(alpha: 0.3)),
                 ),
-                child: Icon(icone, color: corIcone, size: 21),
+                child: Icon(icone, color: corIcone, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -53,19 +58,20 @@ class CartaoLista extends StatelessWidget {
                       titulo,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(subtitulo, style: Estilos.legenda),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Cores.textoApagado),
+              const Icon(Icons.chevron_right_rounded, color: Cores.textoApagado),
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -93,43 +99,40 @@ class CartaoDestaque extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: cor.withValues(alpha: 0.35)),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [cor.withValues(alpha: 0.16), Cores.cartao],
-        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: cor.withValues(alpha: 0.4)),
+        gradient: Efeitos.tingido(cor, forca: 0.2),
+        boxShadow: Efeitos.sombraCartao,
       ),
       child: Row(
         children: [
           Container(
-            width: 50,
-            height: 50,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: cor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: cor.withValues(alpha: 0.25), blurRadius: 18)],
+              boxShadow: Efeitos.brilho(cor, forca: 0.3, desfoque: 20),
             ),
-            child: Icon(icone, color: cor, size: 24),
+            child: Icon(icone, color: cor, size: 26),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(titulo, style: Estilos.tituloDialogo),
-                const SizedBox(height: 3),
-                Text(texto, style: Estilos.legenda.copyWith(color: Cores.textoSecundario)),
+                const SizedBox(height: 4),
+                Text(texto, style: Estilos.legenda.copyWith(fontSize: 13, color: Cores.textoSecundario)),
                 if (progresso != null) ...[
                   const SizedBox(height: 10),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progresso,
-                      minHeight: 5,
+                      minHeight: 6,
                       color: cor,
                       backgroundColor: Cores.trilho,
                     ),
@@ -161,9 +164,7 @@ class IconeDestaque extends StatelessWidget {
           color: cor.withValues(alpha: 0.12),
           shape: BoxShape.circle,
           border: Border.all(color: cor.withValues(alpha: 0.7), width: 1.5),
-          boxShadow: [
-            BoxShadow(color: cor.withValues(alpha: 0.25), blurRadius: 30),
-          ],
+          boxShadow: Efeitos.brilho(cor, forca: 0.3, desfoque: 36),
         ),
         child: Icon(icone, color: cor, size: 44),
       ),

@@ -32,7 +32,7 @@ class PaginaDiario extends StatelessWidget {
     final corStatus = pronto ? Cores.verde : Cores.ambar;
     const estiloTexto = TextStyle(
       color: Cores.texto,
-      fontSize: 13,
+      fontSize: 15,
       height: 1.55,
     );
 
@@ -116,7 +116,7 @@ class DicaDiario extends StatelessWidget {
                     text: 'escreva solto, do tamanho que der\n',
                     style: TextStyle(
                       color: Cores.texto,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -126,7 +126,7 @@ class DicaDiario extends StatelessWidget {
                         'fatos. nada vira memória sem você confirmar.',
                     style: TextStyle(
                       color: Color(0xFF777181),
-                      fontSize: 10,
+                      fontSize: 12,
                       height: 1.35,
                     ),
                   ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:codice_app/app/abas.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/tema/efeitos.dart';
 
-/// Barra das abas (Material 3): a aba aberta ganha uma pílula roxa.
+/// Barra das abas flutuante: uma cápsula com cantos bem arredondados que
+/// "descola" do fundo; a aba aberta ganha uma pílula roxa.
 class NavegacaoInferior extends StatelessWidget {
   final int selecionada;
   final ValueChanged<int> aoSelecionar;
@@ -15,26 +17,37 @@ class NavegacaoInferior extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Cores.linha)),
-      ),
-      child: NavigationBar(
-        selectedIndex: selecionada,
-        onDestinationSelected: aoSelecionar,
-        height: 62,
-        backgroundColor: Cores.barra,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: Cores.roxoAtivo,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: [
-          for (final aba in abas)
-            NavigationDestination(
-              icon: Icon(aba.icone, color: Cores.textoApagado, size: 21),
-              selectedIcon: Icon(aba.icone, color: Cores.roxoClaro, size: 21),
-              label: aba.nome,
-            ),
-        ],
+    final forma = BorderRadius.circular(28);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Cores.barra,
+          borderRadius: forma,
+          border: Border.all(color: Cores.linha),
+          boxShadow: Efeitos.sombraCartao,
+        ),
+        child: ClipRRect(
+          borderRadius: forma,
+          child: NavigationBar(
+            selectedIndex: selecionada,
+            onDestinationSelected: aoSelecionar,
+            height: 66,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            indicatorColor: Cores.roxoAtivo,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            destinations: [
+              for (final aba in abas)
+                NavigationDestination(
+                  icon: Icon(aba.icone, color: Cores.textoApagado, size: 23),
+                  selectedIcon: Icon(aba.icone, color: Cores.roxoClaro, size: 23),
+                  label: aba.nome,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

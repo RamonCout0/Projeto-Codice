@@ -247,7 +247,7 @@ class _SessaoSeguraTelaState extends State<SessaoSeguraTela> {
                               '${navi.id}',
                               style: const TextStyle(
                                 color: Cores.roxoClaro,
-                                fontSize: 12,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

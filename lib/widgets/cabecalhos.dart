@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
 import 'package:codice_app/widgets/avatar_navi.dart';
 import 'package:codice_app/widgets/menu.dart';
@@ -18,7 +19,7 @@ class CabecalhoAba extends StatelessWidget {
   Widget build(BuildContext context) {
     final cor = context.watch<Sessao>().perfil.elemento.cor;
     return SizedBox(
-      height: 48,
+      height: 56,
       child: Row(
         children: [
           const BotaoMenu(),
@@ -40,12 +41,13 @@ class CabecalhoAba extends StatelessWidget {
                   rootNavigator: true,
                 ).pushNamed(Rotas.perfil),
                 child: Container(
-                  padding: const EdgeInsets.all(1.5),
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: cor.withValues(alpha: 0.8)),
+                    border: Border.all(color: cor.withValues(alpha: 0.85), width: 1.5),
+                    boxShadow: Efeitos.brilho(cor, forca: 0.3, desfoque: 12),
                   ),
-                  child: const AvatarNavi(largura: 28, altura: 28, redondo: true),
+                  child: const AvatarNavi(largura: 34, altura: 34, redondo: true),
                 ),
               ),
             ),
@@ -65,13 +67,13 @@ class CabecalhoDetalhe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 48,
+      height: 56,
       child: Row(
         children: [
           IconButton(
             tooltip: 'voltar',
             onPressed: () => Navigator.maybePop(context),
-            icon: const Icon(Icons.arrow_back, size: 20),
+            icon: const Icon(Icons.arrow_back_rounded, size: 22),
           ),
           Expanded(
             child: Text(
@@ -95,7 +97,7 @@ class TituloGrande extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -104,7 +106,7 @@ class TituloGrande extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitulo!,
-              style: Estilos.legenda.copyWith(fontSize: 11, color: Cores.textoSecundario),
+              style: Estilos.legenda.copyWith(fontSize: 13, color: Cores.textoSecundario),
             ),
           ],
         ],

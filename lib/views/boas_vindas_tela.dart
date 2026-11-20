@@ -58,7 +58,7 @@ class _BoasVindasTelaState extends State<BoasVindasTela> {
                   'Códice',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 30,
+                    fontSize: 38,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
@@ -67,7 +67,7 @@ class _BoasVindasTelaState extends State<BoasVindasTela> {
                 const Text(
                   'Nuvem Assistencial de Visualização Interativa',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Cores.textoApagado, fontSize: 10),
+                  style: TextStyle(color: Cores.textoApagado, fontSize: 12),
                 ),
                 const Spacer(),
                 Container(
@@ -95,7 +95,7 @@ class _BoasVindasTelaState extends State<BoasVindasTela> {
                       'IRIS · guia',
                       style: TextStyle(
                         color: Cores.turquesa,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -105,7 +105,7 @@ class _BoasVindasTelaState extends State<BoasVindasTela> {
                 const Text(
                   'um diário onde uma criatura digital\naprende com a convivência.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Cores.textoSuave, fontSize: 12, height: 1.45),
+                  style: TextStyle(color: Cores.textoSuave, fontSize: 13, height: 1.45),
                 ),
                 const Spacer(flex: 2),
                 AnimatedSwitcher(
@@ -157,7 +157,7 @@ class _Logo extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Cores.roxoClaro, Color(0xFF7A5CF0)],
+          colors: [Cores.roxoClaro, Cores.roxoProfundo],
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [

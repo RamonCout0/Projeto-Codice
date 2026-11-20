@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:codice_app/tema/cores.dart';
+import 'package:codice_app/tema/efeitos.dart';
 import 'package:codice_app/tema/estilos.dart';
 
 /// Caixa com fundo e borda: a base visual de quase todos os cartões.
@@ -15,7 +16,7 @@ class Painel extends StatelessWidget {
   const Painel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(12),
+    this.padding = const EdgeInsets.all(16),
     this.cor = Cores.cartao,
     this.borda = Cores.borda,
     this.raio,
@@ -32,8 +33,10 @@ class Painel extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: cor,
+        gradient: Efeitos.volume(cor),
         borderRadius: raio ?? BorderRadius.circular(Estilos.raio),
         border: Border.all(color: borda),
+        boxShadow: Efeitos.sombraCartao,
       ),
       child: child,
     );
@@ -61,7 +64,7 @@ class Pilula extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final raio = BorderRadius.circular(15);
+    final raio = BorderRadius.circular(18);
     // Material próprio: o Ink pinta nele, e não num Material lá atrás (que
     // ficaria escondido sob um cartão colorido).
     return Material(
@@ -70,7 +73,7 @@ class Pilula extends StatelessWidget {
         onTap: onTap,
         borderRadius: raio,
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: fundo,
             borderRadius: raio,
@@ -80,8 +83,8 @@ class Pilula extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icone != null) ...[
-                Icon(icone, color: cor, size: 13),
-                const SizedBox(width: 5),
+                Icon(icone, color: cor, size: 15),
+                const SizedBox(width: 6),
               ],
               Flexible(
                 child: Text(
@@ -90,8 +93,8 @@ class Pilula extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: cor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -108,7 +111,7 @@ class BarraProgresso extends StatelessWidget {
   final Color? cor;
   final double altura;
 
-  const BarraProgresso(this.valor, {super.key, this.cor, this.altura = 5});
+  const BarraProgresso(this.valor, {super.key, this.cor, this.altura = 6});
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +121,7 @@ class BarraProgresso extends StatelessWidget {
         value: valor,
         minHeight: altura,
         color: cor,
+        backgroundColor: Cores.trilho,
       ),
     );
   }
@@ -137,8 +141,8 @@ void avisar(
         action: acao,
         content: Row(
           children: [
-            Icon(icone, color: Cores.roxo, size: 16),
-            const SizedBox(width: 8),
+            Icon(icone, color: Cores.roxo, size: 18),
+            const SizedBox(width: 10),
             Expanded(child: Text(mensagem)),
           ],
         ),

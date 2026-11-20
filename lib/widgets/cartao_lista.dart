@@ -8,14 +8,14 @@ class CartaoLista extends StatelessWidget {
   final Color corIcone;
   final String titulo;
   final String subtitulo;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const CartaoLista({
     super.key,
     required this.icone,
     required this.titulo,
     required this.subtitulo,
-    required this.onTap,
+    this.onTap,
     this.corIcone = Cores.roxo,
   });
 

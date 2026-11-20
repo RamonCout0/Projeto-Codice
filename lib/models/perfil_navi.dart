@@ -56,6 +56,16 @@ enum Elemento {
     Color(0xFFF5F06B),
     'rápida e agitada; pensa alto, junta ideias depressa e adora jogos e '
         'desafios',
+  ),
+  // Exclusivo dos GMs (como a Iris): o servidor recusa quem tentar se
+  // registrar com ele, e a tela de criação não o oferece.
+  cyber(
+    'Cyber',
+    Icons.memory,
+    Color(0xFF3DF2E0),
+    'precisa e analítica; fala como quem enxerga a cidade inteira de cima, '
+        'com calma e um toque de ironia',
+    soGM: true,
   );
 
   final String titulo;
@@ -64,7 +74,16 @@ enum Elemento {
 
   /// Como o Gemma deve interpretar este elemento.
   final String jeito;
-  const Elemento(this.titulo, this.icone, this.cor, this.jeito);
+
+  /// Só game masters têm; nenhum jogador pode escolher.
+  final bool soGM;
+  const Elemento(this.titulo, this.icone, this.cor, this.jeito, {this.soGM = false});
+
+  /// Os elementos que a pessoa pode escolher ao criar o NAVI.
+  static List<Elemento> get escolhiveis => [
+    for (final e in values)
+      if (!e.soGM) e,
+  ];
 }
 
 /// Traços de personalidade: o NAVI tem de 1 a 3.

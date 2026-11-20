@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:codice_app/app/navegacao_abas.dart';
+import 'package:codice_app/controllers/cidade_navi.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/codice_app.dart';
@@ -14,7 +16,9 @@ class RaizCodice extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => EstadoCodice()),
+        ChangeNotifierProvider(create: (_) => EstadoCodice()..carregar()),
+        ChangeNotifierProvider(create: (_) => CidadeNavi()),
+        ChangeNotifierProvider(create: (_) => NavegacaoAbas()),
         ChangeNotifierProvider(create: (_) => Ajustes()..carregar()),
         ChangeNotifierProvider(create: (_) => ArquivosNavi()..carregar()),
         // Conta e personalidade do NAVI (a sessão guardada é conferida na

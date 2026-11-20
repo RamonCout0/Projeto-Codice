@@ -41,7 +41,6 @@ class _DiarioTelaState extends State<DiarioTela> {
   Humor _humor = Humor.esperando;
   String _fala =
       'oi. me conta como foi o dia — eu só sei o que você me ensina.';
-  double _conhecimento = 0.22;
   int _carinhos = 0;
   bool _pulando = false;
   Timer? _voltarAoNormal;
@@ -170,7 +169,6 @@ class _DiarioTelaState extends State<DiarioTela> {
     );
     setState(() {
       _estado.guardarMemoria(nova);
-      _conhecimento = (_conhecimento + 0.08).clamp(0, 1);
       _limparRascunho();
       _processando = false;
     });
@@ -185,8 +183,14 @@ class _DiarioTelaState extends State<DiarioTela> {
       acao: SnackBarAction(label: 'ver', onPressed: _abrirMemorias),
     );
 
-    // Se o fato novo bate de frente com um antigo, ela pergunta sozinha.
+    // Se o fato novo bate de frente com um antigo, ela pergunta sozinha. A
+    // pergunta fica guardada: se a pessoa sair daqui, a Home a mostra.
     if (contradiz) {
+      final antiga = _memorias
+          .skip(1)
+          .where((m) => m.etiquetas.contains('emprego'))
+          .first;
+      _estado.perguntar(PerguntaPendente(antiga, 'emprego'));
       await Future.delayed(const Duration(milliseconds: 1400));
       if (!mounted) return;
       if (Visibility.of(context)) {
@@ -198,17 +202,15 @@ class _DiarioTelaState extends State<DiarioTela> {
   }
 
   Future<void> _resolverContradicao() async {
-    // A memória nova está no índice 0; a antiga é a próxima de emprego.
-    final antigas = _memorias
-        .skip(1)
-        .where((m) => m.etiquetas.contains('emprego'));
-    if (antigas.isEmpty) return;
-    final antiga = antigas.first;
+    final pendente = _estado.pergunta;
+    if (pendente == null) return;
+    final antiga = pendente.antiga;
     _falar('espera... isso não bate com o que eu sabia.', Humor.confusa);
 
     final mudou = await perguntarContradicao(context, antiga);
     if (!mounted || mudou == null) return;
     if (mudou) _estado.esquecerMemoria(antiga);
+    _estado.encerrarPergunta();
     _falar(
       mudou
           ? 'anotado. troquei o que eu sabia.'
@@ -358,7 +360,7 @@ class _DiarioTelaState extends State<DiarioTela> {
                 fala: _fala,
                 pulando: _pulando,
                 carinhos: _carinhos,
-                conhecimento: _conhecimento,
+                conhecimento: context.watch<EstadoCodice>().progressoIdade,
                 aoTocar: _tocarNavi,
                 aoTocarDuasVezes: _carinhoNavi,
                 aoSegurar: _segurarNavi,

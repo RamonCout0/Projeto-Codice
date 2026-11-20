@@ -17,6 +17,45 @@ const enderecoNavicity = String.fromEnvironment(
   defaultValue: 'http://localhost:8080',
 );
 
+/// Um lugar da cidade, com quem está nele agora.
+class AreaDaCidade {
+  const AreaDaCidade({
+    required this.id,
+    required this.nome,
+    required this.tipo,
+    required this.presentes,
+    required this.voce,
+  });
+
+  factory AreaDaCidade.fromJson(Object? dados) {
+    if (dados is Map &&
+        dados['id'] is int &&
+        dados['nome'] is String &&
+        dados['tipo'] is String &&
+        dados['presentes'] is int &&
+        dados['voce'] is bool) {
+      return AreaDaCidade(
+        id: dados['id'] as int,
+        nome: dados['nome'] as String,
+        tipo: dados['tipo'] as String,
+        presentes: dados['presentes'] as int,
+        voce: dados['voce'] as bool,
+      );
+    }
+    throw const FormatException();
+  }
+
+  final int id;
+  final String nome;
+
+  /// praca, biblioteca ou cafe: o app escolhe o desenho por aqui.
+  final String tipo;
+  final int presentes;
+
+  /// O NAVI do usuário está neste lugar agora.
+  final bool voce;
+}
+
 /// Onde o NAVI está na cidade.
 class SituacaoNaCidade {
   const SituacaoNaCidade({
@@ -25,22 +64,24 @@ class SituacaoNaCidade {
     required this.area,
     required this.estado,
     required this.areas,
+    required this.agoraSegundos,
   });
 
   factory SituacaoNaCidade.fromJson(Object? dados) {
-    if (dados case {
-      'id': int id,
-      'apelido': String apelido,
-      'area': String area,
-      'estado': String estado,
-      'areas': List<dynamic> areas,
-    }) {
+    if (dados is Map &&
+        dados['id'] is int &&
+        dados['apelido'] is String &&
+        dados['area'] is String &&
+        dados['estado'] is String &&
+        dados['areas'] is List &&
+        dados['agora_s'] is int) {
       return SituacaoNaCidade(
-        id: id,
-        apelido: apelido,
-        area: area,
-        estado: estado,
-        areas: [for (final a in areas) a.toString()],
+        id: dados['id'] as int,
+        apelido: dados['apelido'] as String,
+        area: dados['area'] as String,
+        estado: dados['estado'] as String,
+        areas: [for (final a in dados['areas'] as List) AreaDaCidade.fromJson(a)],
+        agoraSegundos: dados['agora_s'] as int,
       );
     }
     throw const FormatException();
@@ -50,7 +91,10 @@ class SituacaoNaCidade {
   final String apelido;
   final String area;
   final String estado; // ocioso, andando ou conversando
-  final List<String> areas;
+  final List<AreaDaCidade> areas;
+
+  /// Relógio da cidade (segundos desde o nascimento dela).
+  final int agoraSegundos;
 }
 
 /// Um acontecimento da cidade, do ponto de vista do NAVI do usuário.
@@ -63,6 +107,7 @@ class FatoDaCidade {
     required this.area,
     this.destino,
     this.outro,
+    this.outroGm = false,
     this.lado,
     this.afinidade,
     this.delta,
@@ -84,6 +129,7 @@ class FatoDaCidade {
         area: dados['area'] as String,
         destino: dados['destino'] as String?,
         outro: dados['outro'] as String?,
+        outroGm: dados['outro_gm'] == true,
         lado: dados['lado'] as String?,
         afinidade: dados['afinidade'] as int?,
         delta: dados['delta'] as int?,
@@ -100,6 +146,7 @@ class FatoDaCidade {
   final String area;
   final String? destino;
   final String? outro; // apelido do outro NAVI
+  final bool outroGm; // o outro é um GM (ex.: Iris)
   final String? lado; // "origem" (puxou) ou "alvo" (foi chamado)
   final int? afinidade; // sempre do ponto de vista do NAVI do usuário
   final int? delta;
@@ -107,8 +154,11 @@ class FatoDaCidade {
 }
 
 class FatosDaCidade {
-  const FatosDaCidade(this.fatos, this.cursor);
+  const FatosDaCidade(this.fatos, this.cursor, this.agoraSegundos);
   final List<FatoDaCidade> fatos;
+
+  /// Relógio da cidade neste momento, para dizer "há 12 minutos".
+  final int agoraSegundos;
 
   /// Mande de volta como `desde` na próxima consulta.
   final int cursor;
@@ -120,6 +170,7 @@ class FatosDaCidade {
 class ApiNavicity {
   ApiNavicity(
     this.endereco, {
+    this.conta = 'local',
     FlutterSecureStorage storage = const FlutterSecureStorage(),
     http.Client? cliente,
     DateTime Function()? agora,
@@ -128,6 +179,10 @@ class ApiNavicity {
        _agora = agora ?? DateTime.now;
 
   final String endereco;
+
+  /// Cada conta do app tem a própria identidade (par de chaves) na cidade;
+  /// sem conta, vale "local".
+  final String conta;
   final FlutterSecureStorage _storage;
   final http.Client? _cliente;
   final DateTime Function() _agora;
@@ -153,8 +208,8 @@ class ApiNavicity {
     return uri;
   }
 
-  String get _chaveSemente => 'navicity.semente.${_base.origin}';
-  String get _chaveId => 'navicity.id.${_base.origin}';
+  String get _chaveSemente => 'navicity.semente.$conta.${_base.origin}';
+  String get _chaveId => 'navicity.id.$conta.${_base.origin}';
 
   Future<SimpleKeyPair> _par() async {
     try {
@@ -208,10 +263,14 @@ class ApiNavicity {
   Future<FatosDaCidade> fatos({int desde = 0}) async {
     final dados = await _autenticado('GET', '/fatos?desde=$desde');
     try {
-      if (dados case {'fatos': List<dynamic> lista, 'cursor': int cursor}) {
+      if (dados case {
+        'fatos': List<dynamic> lista,
+        'cursor': int cursor,
+        'agora_s': int agora,
+      }) {
         return FatosDaCidade([
           for (final f in lista) FatoDaCidade.fromJson(f),
-        ], cursor);
+        ], cursor, agora);
       }
     } on FormatException {
       // cai no erro abaixo

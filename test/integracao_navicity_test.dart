@@ -27,10 +27,11 @@ void main() {
       ),
     );
     expect(situacao.apelido, isNotEmpty);
-    expect(situacao.areas, contains('Praça dos Bipes'));
+    expect(situacao.areas.map((a) => a.nome), contains('Praça dos Bipes'));
+    expect(situacao.areas.any((a) => a.voce), isTrue);
 
-    final de_novo = await api.situacao();
-    expect(de_novo.id, situacao.id);
+    final deNovo = await api.situacao();
+    expect(deNovo.id, situacao.id);
 
     final fatos = await api.fatos();
     expect(fatos.cursor, greaterThanOrEqualTo(0));

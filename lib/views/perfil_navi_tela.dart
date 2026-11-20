@@ -120,7 +120,7 @@ class _PerfilNaviTelaState extends State<PerfilNaviTela> {
                     crossAxisSpacing: 8,
                     childAspectRatio: 0.95,
                     children: [
-                      for (final e in Elemento.values)
+                      for (final e in Elemento.escolhiveis)
                         _CartaoElemento(
                           elemento: e,
                           escolhido: e == elemento,

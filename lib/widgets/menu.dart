@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
+import 'package:codice_app/app/navegacao_abas.dart';
+import 'package:codice_app/controllers/cidade_navi.dart';
+import 'package:codice_app/controllers/estado_codice.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/tema/estilos.dart';
@@ -62,6 +65,9 @@ class MenuLateral extends StatelessWidget {
         // Mesmo sem apagar do armazenamento, a sessão some desta tela.
       }
     }
+    if (!context.mounted) return;
+    context.read<CidadeNavi>().desconectar();
+    context.read<NavegacaoAbas>().irPara(0);
     navegador.pushReplacementNamed(Rotas.inicio);
   }
 
@@ -101,7 +107,7 @@ class MenuLateral extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${perfil.elemento.titulo} · 8 anos · criança',
+                          '${perfil.elemento.titulo} · ${context.watch<EstadoCodice>().idade} anos · ${context.watch<EstadoCodice>().fase}',
                           style: TextStyle(color: perfil.elemento.cor, fontSize: 10),
                         ),
                         if (sessao.usuario != null)

@@ -1,51 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/rotas.dart';
-import 'package:codice_app/data/lugares_demo.dart';
+import 'package:codice_app/controllers/cidade_navi.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';
 import 'package:codice_app/widgets/cabecalhos.dart';
 import 'package:codice_app/widgets/cartao_lista.dart';
+import 'package:codice_app/widgets/estado_cidade.dart';
 
 class CidadeTela extends StatelessWidget {
   const CidadeTela({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cidade = context.watch<CidadeNavi>();
+    final nome = context.watch<Sessao>().perfil.nome;
+    final lugares = cidade.lugares;
+    final onde = cidade.situacao;
+    final total = lugares.fold<int>(0, (soma, l) => soma + l.presentes);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const CabecalhoAba('Cidade'),
         TituloGrande(
           'Cidade',
-          subtitulo: 'lugares que ${context.watch<Sessao>().perfil.nome} conhece',
+          subtitulo: onde == null
+              ? 'a cidade onde $nome vive'
+              : '$nome está em ${onde.area} · ${onde.estado}',
         ),
         const SizedBox(height: 14),
         Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            itemCount: lugares.length + 1,
-            separatorBuilder: (_, i) => SizedBox(height: i == 0 ? 16 : 8),
-            itemBuilder: (context, i) {
-              if (i == 0) {
-                return CartaoDestaque(
-                  icone: Icons.location_city,
-                  cor: Cores.ciano,
-                  titulo: 'NAVICity',
-                  texto:
-                      '${lugares.length} lugares revelados. Outros aparecem '
-                      'quando você passa por lugares de verdade.',
-                );
-              }
-              final lugar = lugares[i - 1];
-              return CartaoLista(
-                icone: lugar.icone,
-                titulo: lugar.nome,
-                subtitulo: lugar.comoRevelou,
-                onTap: () =>
-                    Navigator.pushNamed(context, Rotas.lugar, arguments: lugar),
-              );
-            },
+          child: RefreshIndicator(
+            onRefresh: cidade.atualizar,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              children: [
+                if (lugares.isEmpty)
+                  AvisoCidade(cidade)
+                else ...[
+                  CartaoDestaque(
+                    icone: Icons.location_city,
+                    cor: Cores.ciano,
+                    titulo: 'NAVICity',
+                    texto:
+                        '${lugares.length} lugares · $total '
+                        '${total == 1 ? 'NAVI' : 'NAVIs'} na cidade agora.',
+                  ),
+                  const SizedBox(height: 16),
+                  for (final lugar in lugares) ...[
+                    CartaoLista(
+                      icone: lugar.icone,
+                      corIcone: lugar.voce ? Cores.verde : Cores.roxo,
+                      titulo: lugar.nome,
+                      subtitulo: lugar.voce
+                          ? 'você está aqui · ${lugar.descricao}'
+                          : lugar.descricao,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        Rotas.lugar,
+                        arguments: lugar,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ],
+              ],
+            ),
           ),
         ),
       ],

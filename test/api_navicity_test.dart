@@ -17,7 +17,12 @@ const _situacao = {
   'apelido': 'Karo',
   'area': 'Praça dos Bipes',
   'estado': 'ocioso',
-  'areas': ['Praça dos Bipes', 'Biblioteca Velha', 'Café da Esquina'],
+  'agora_s': 600,
+  'areas': [
+    {'id': 0, 'nome': 'Praça dos Bipes', 'tipo': 'praca', 'presentes': 3, 'voce': true},
+    {'id': 1, 'nome': 'Biblioteca Velha', 'tipo': 'biblioteca', 'presentes': 1, 'voce': false},
+    {'id': 2, 'nome': 'Café da Esquina', 'tipo': 'cafe', 'presentes': 0, 'voce': false},
+  ],
 };
 
 /// Refaz o que o servidor faz: monta o texto assinado e confere com a chave
@@ -79,6 +84,9 @@ void main() {
     final s = await api.entrar(PerfilNavi.padrao);
     expect(s.id, 42);
     expect(s.apelido, 'Karo');
+    expect(s.areas.first.tipo, 'praca');
+    expect(s.areas.first.voce, isTrue);
+    expect(s.agoraSegundos, 600);
   });
 
   test('a mesma identidade é reaproveitada e a consulta leva X-Navi', () async {
@@ -95,6 +103,7 @@ void main() {
       expect(pedido.url.query, 'desde=7');
       return _resp({
           'cursor': 9,
+          'agora_s': 700,
           'fatos': [
             {
               'seq': 8,
@@ -114,6 +123,7 @@ void main() {
     await api.entrar(PerfilNavi.padrao);
     final r = await api.fatos(desde: 7);
     expect(r.cursor, 9);
+    expect(r.agoraSegundos, 700);
     expect(r.fatos.single.outro, 'Zeta');
     expect(r.fatos.single.afinidade, 61);
     expect(r.fatos.single.delta, isNull);

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:codice_app/app/abas.dart';
+import 'package:codice_app/app/navegacao_abas.dart';
+import 'package:codice_app/controllers/cidade_navi.dart';
+import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/app/rotas.dart';
 import 'package:codice_app/widgets/menu.dart';
 import 'package:codice_app/widgets/navegacao_inferior.dart';
@@ -15,11 +19,26 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  int _aba = 0;
   final _scaffold = GlobalKey<ScaffoldState>();
   final _navegadores = [for (final _ in abas) GlobalKey<NavigatorState>()];
 
+  int get _aba => context.read<NavegacaoAbas>().aba;
+
   NavigatorState? get _navegadorAtual => _navegadores[_aba].currentState;
+
+  @override
+  void initState() {
+    super.initState();
+    // Entra na NAVICity com o NAVI da conta (ou do aparelho, sem conta).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final sessao = context.read<Sessao>();
+      context.read<CidadeNavi>().conectar(
+        sessao.perfil,
+        conta: sessao.usuario ?? 'local',
+      );
+    });
+  }
 
   void _trocarAba(int indice) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -27,7 +46,7 @@ class _AppShellState extends State<AppShell> {
       // Tocar de novo na aba aberta volta para a raiz dela.
       _navegadorAtual?.popUntil((rota) => rota.isFirst);
     } else {
-      setState(() => _aba = indice);
+      context.read<NavegacaoAbas>().irPara(indice);
     }
   }
 
@@ -48,6 +67,7 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final aba = context.watch<NavegacaoAbas>().aba;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
@@ -59,7 +79,7 @@ class _AppShellState extends State<AppShell> {
         body: SafeArea(
           bottom: false,
           child: IndexedStack(
-            index: _aba,
+            index: aba,
             children: [
               for (var i = 0; i < abas.length; i++)
                 Navigator(
@@ -74,7 +94,7 @@ class _AppShellState extends State<AppShell> {
         ),
         bottomNavigationBar: SafeArea(
           top: false,
-          child: NavegacaoInferior(selecionada: _aba, aoSelecionar: _trocarAba),
+          child: NavegacaoInferior(selecionada: aba, aoSelecionar: _trocarAba),
         ),
       ),
     );

@@ -30,20 +30,24 @@ class ConversaGemma {
     List<Memoria> memorias, {
     List<Lugar> lugares = const [],
     List<NaviEncontrado> encontros = const [],
+    int idade = 8,
   }) {
-    // Os textos de demonstração foram escritos para a Frost.
-    String comNome(String texto) => texto.replaceAll('Frost', perfil.nome);
+    final fase = idade < 14
+        ? 'criança'
+        : idade < 18
+        ? 'adolescente'
+        : 'adulta';
 
     final vida = [
-      'Você tem 8 anos e está na fase criança: ainda está aprendendo a ler '
-          'o mundo.',
+      'Você tem $idade anos e está na fase $fase: sua idade cresce com o que '
+          'a pessoa te ensina.',
       if (lugares.isNotEmpty)
-        'Lugares da NAVICity que você conhece:\n'
-            '${lugares.map((l) => '- ${l.nome}: ${comNome(l.descricao)}').join('\n')}',
+        'Lugares da NAVICity (estado de agora):\n'
+            '${lugares.map((l) => '- ${l.nome}: ${l.descricao}').join('\n')}',
       if (encontros.isNotEmpty)
         'NAVIs que você conheceu (afinidade de 0 a 100):\n'
-            '${encontros.map((n) => '- ${n.comoChamar} (${n.afinidade}), '
-                '${n.quando}: ${comNome(n.relato)}').join('\n')}',
+            '${encontros.map((n) => '- ${n.comoChamar}${n.gm ? ' (GM da cidade)' : ''} '
+                '(${n.afinidade}), ${n.quando}: ${n.relato}').join('\n')}',
     ].join('\n');
 
     final sabe = memorias.isEmpty

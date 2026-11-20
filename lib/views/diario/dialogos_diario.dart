@@ -61,7 +61,7 @@ Future<bool?> perguntarContradicao(BuildContext context, Memoria antiga) {
         side: const BorderSide(color: Cores.ambarBorda),
       ),
       icon: const Icon(Icons.favorite_border, color: Cores.ambar),
-      title: const Text('«Você mudou de emprego?»'),
+      title: Text('«${antiga.etiquetas.contains('emprego') ? 'Você mudou de emprego?' : 'Isso mudou?'}»'),
       content: Text(
         'antes você me contou: «${antiga.texto}»\n\n'
         'dois fatos que eu guardo se contradizem.',

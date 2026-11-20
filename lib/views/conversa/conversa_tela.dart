@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/controllers/estado_codice.dart';
-import 'package:codice_app/data/lugares_demo.dart';
+import 'package:codice_app/controllers/cidade_navi.dart';
 import 'package:codice_app/models/ajustes.dart';
 import 'package:codice_app/models/humor.dart';
 import 'package:codice_app/models/mensagem.dart';
@@ -64,8 +64,9 @@ class _ConversaTelaState extends State<ConversaTela> {
     return ConversaGemma.instrucoes(
       context.read<Sessao>().perfil,
       estado.memorias,
-      lugares: lugares,
-      encontros: estado.navis,
+      idade: estado.idade,
+      lugares: context.read<CidadeNavi>().lugares,
+      encontros: context.read<CidadeNavi>().encontros,
     );
   }
 

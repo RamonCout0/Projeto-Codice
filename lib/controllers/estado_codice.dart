@@ -1,70 +1,105 @@
-import 'package:flutter/material.dart';
-import 'package:codice_app/tema/cores.dart';
+import 'dart:convert';
+import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:codice_app/models/memoria.dart';
-import 'package:codice_app/models/navi_encontrado.dart';
 
+/// Uma pergunta que a NAVI ainda quer fazer: duas memórias se contradizem.
+class PerguntaPendente {
+  const PerguntaPendente(this.antiga, this.etiqueta);
+
+  /// A memória antiga, que pode ser trocada pela nova.
+  final Memoria antiga;
+  final String etiqueta;
+
+  String get texto =>
+      etiqueta == 'emprego' ? 'Você mudou de emprego?' : 'Isso mudou?';
+}
+
+/// O que a NAVI sabe: escrito no Diário e usado na Conversa. As memórias
+/// ficam guardadas no aparelho, e a idade da NAVI cresce com elas (como diz
+/// a ideia do projeto: a idade é o conhecimento adquirido pela convivência).
 class EstadoCodice extends ChangeNotifier {
-  final List<NaviEncontrado> _navis = [
-    NaviEncontrado(
-      'Pixel',
-      72,
-      'hoje, 14:20 · Praça dos Bipes',
-      'Pixel fala rápido e repete os bipes de três em três. A Frost achou '
-          'engraçado e quer encontrar de novo.',
-      const Color(0xFF6CEFF1),
-    ),
-    NaviEncontrado(
-      'Bolota',
-      45,
-      'ontem, 19:05 · Café da Esquina',
-      'Bolota ficou quieto quase o encontro todo. A Frost acha que ele é '
-          'tímido, não chato.',
-      const Color(0xFFFFB86B),
-    ),
-    NaviEncontrado(
-      'Nimbus',
-      88,
-      'segunda, 08:40 · Biblioteca Velha',
-      'Nimbus também gosta de ler. Os dois trocaram bipes longos, que no '
-          'Navidês é sinal de amizade.',
-      Cores.roxo,
-    ),
-  ];
+  static const _chave = 'codice.memorias';
 
-  /// O que a NAVI sabe: escrito no Diário e usado na Conversa.
-  /// Começa com uma memória antiga de propósito: é ela que permite
-  /// demonstrar a contradição ("você mudou de emprego?").
-  final List<Memoria> _memorias = [
-    Memoria('Trabalho na livraria do centro.', {
-      'emprego',
-    }, DateTime(2026, 9, 1)),
-  ];
+  /// A cada quantas memórias a NAVI faz aniversário.
+  static const memoriasPorAno = 5;
+  static const idadeInicial = 8;
+  static const idadeMaxima = 18;
+
+  final List<Memoria> _memorias = [];
+  PerguntaPendente? _pergunta;
 
   List<Memoria> get memorias => List.unmodifiable(_memorias);
+  PerguntaPendente? get pergunta => _pergunta;
+
+  int get idade =>
+      math.min(idadeMaxima, idadeInicial + _memorias.length ~/ memoriasPorAno);
+
+  String get fase => idade < 14
+      ? 'criança'
+      : idade < idadeMaxima
+      ? 'adolescente'
+      : 'adulta';
+
+  /// 0 a 1: quanto falta para o próximo aniversário.
+  double get progressoIdade =>
+      idade >= idadeMaxima ? 1 : (_memorias.length % memoriasPorAno) / memoriasPorAno;
+
+  int get faltamParaCrescer =>
+      idade >= idadeMaxima ? 0 : memoriasPorAno - (_memorias.length % memoriasPorAno);
+
+  /// Lê as memórias guardadas no aparelho.
+  Future<void> carregar() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final texto = prefs.getString(_chave);
+      if (texto == null) return;
+      final dados = jsonDecode(texto);
+      if (dados is! List) return;
+      _memorias
+        ..clear()
+        ..addAll(dados.map(Memoria.fromJson).whereType<Memoria>());
+      notifyListeners();
+    } catch (_) {
+      // Sem armazenamento (testes) ou dado corrompido: começa vazio.
+    }
+  }
+
+  Future<void> _salvar() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _chave,
+        jsonEncode([for (final m in _memorias) m.toJson()]),
+      );
+    } catch (_) {
+      // Sem armazenamento: as memórias valem até fechar o app.
+    }
+  }
 
   void guardarMemoria(Memoria memoria) {
     _memorias.insert(0, memoria);
     notifyListeners();
+    _salvar();
   }
 
   void esquecerMemoria(Memoria memoria) {
-    if (_memorias.remove(memoria)) notifyListeners();
-  }
-
-  List<NaviEncontrado> get navis => List.unmodifiable(_navis);
-
-  NaviEncontrado? obterNavi(String nome) {
-    for (final navi in _navis) {
-      if (navi.nome == nome) return navi;
+    if (_memorias.remove(memoria)) {
+      if (_pergunta?.antiga == memoria) _pergunta = null;
+      notifyListeners();
+      _salvar();
     }
-    return null;
   }
 
-  void alterarApelido(String nome, String novoApelido) {
-    final navi = obterNavi(nome);
-    if (navi == null || novoApelido.trim().isEmpty) return;
+  void perguntar(PerguntaPendente pergunta) {
+    _pergunta = pergunta;
+    notifyListeners();
+  }
 
-    navi.apelido = novoApelido.trim();
+  void encerrarPergunta() {
+    if (_pergunta == null) return;
+    _pergunta = null;
     notifyListeners();
   }
 }

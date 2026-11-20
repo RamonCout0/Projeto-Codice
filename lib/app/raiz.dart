@@ -10,14 +10,17 @@ import 'package:codice_app/services/navi_3d/arquivos_navi.dart';
 
 /// Estado global do app, disponível em todas as telas pelo Provider.
 class RaizCodice extends StatelessWidget {
-  const RaizCodice({super.key});
+  /// Os testes passam uma cidade com servidor simulado.
+  final CidadeNavi? cidade;
+
+  const RaizCodice({super.key, this.cidade});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => EstadoCodice()..carregar()),
-        ChangeNotifierProvider(create: (_) => CidadeNavi()),
+        ChangeNotifierProvider(create: (_) => cidade ?? CidadeNavi()),
         ChangeNotifierProvider(create: (_) => NavegacaoAbas()),
         ChangeNotifierProvider(create: (_) => Ajustes()..carregar()),
         ChangeNotifierProvider(create: (_) => ArquivosNavi()..carregar()),

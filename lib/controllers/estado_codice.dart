@@ -52,7 +52,7 @@ class EstadoCodice extends ChangeNotifier {
   /// Lê as memórias guardadas no aparelho.
   Future<void> carregar() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance().timeout(const Duration(seconds: 2));
       final texto = prefs.getString(_chave);
       if (texto == null) return;
       final dados = jsonDecode(texto);
@@ -68,7 +68,7 @@ class EstadoCodice extends ChangeNotifier {
 
   Future<void> _salvar() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance().timeout(const Duration(seconds: 2));
       await prefs.setString(
         _chave,
         jsonEncode([for (final m in _memorias) m.toJson()]),

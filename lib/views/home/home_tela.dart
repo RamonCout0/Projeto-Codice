@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:codice_app/app/navegacao_abas.dart';
-import 'package:codice_app/app/navegacao_abas.dart';
 import 'package:codice_app/app/rotas.dart';
-import 'package:codice_app/controllers/estado_codice.dart';
 import 'package:codice_app/controllers/estado_codice.dart';
 import 'package:codice_app/controllers/sessao.dart';
 import 'package:codice_app/tema/cores.dart';

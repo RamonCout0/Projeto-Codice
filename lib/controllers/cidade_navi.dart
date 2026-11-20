@@ -26,6 +26,9 @@ class CidadeNavi extends ChangeNotifier {
   static const _chaveApelidos = 'cidade.apelidos';
   static const _tamanhoPagina = 200; // igual ao do servidor
 
+  /// O armazenamento nunca deve segurar a conexão com a cidade.
+  static const _esperaMaxima = Duration(seconds: 2);
+
   final ApiNavicity Function(String conta) _fabrica;
   final DateTime Function() _agora;
   final Duration intervalo;
@@ -258,7 +261,7 @@ class CidadeNavi extends ChangeNotifier {
     _apelidos = {..._apelidos, nome: limpo};
     notifyListeners();
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance().timeout(_esperaMaxima);
       await prefs.setString('$_chaveApelidos.$_conta', jsonEncode(_apelidos));
     } catch (_) {
       // Sem armazenamento (ex.: testes): o apelido vale até fechar o app.
@@ -267,7 +270,7 @@ class CidadeNavi extends ChangeNotifier {
 
   Future<void> _carregarApelidos() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance().timeout(_esperaMaxima);
       final texto = prefs.getString('$_chaveApelidos.$_conta');
       if (texto == null) {
         _apelidos = {};

@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:codice_app/controllers/estado_codice.dart';
 import 'package:codice_app/controllers/sessao.dart';
-import 'package:codice_app/data/lugares_demo.dart';
+import 'package:codice_app/models/lugar.dart';
+import 'package:codice_app/models/navi_encontrado.dart';
+import 'package:flutter/material.dart';
 import 'package:codice_app/models/memoria.dart';
 import 'package:codice_app/models/perfil_navi.dart';
 import 'package:codice_app/services/api_codice.dart';
@@ -62,17 +63,43 @@ void main() {
     expect(prompt, contains('Tenho prova sexta.'));
   });
 
-  test('o prompt conta a vida do NAVI: lugares e NAVIs que conheceu', () {
-    final estado = EstadoCodice();
+  test('o prompt conta a vida do NAVI: idade, lugares e NAVIs que conheceu', () {
     final prompt = ConversaGemma.instrucoes(
       _faisca,
       const [],
-      lugares: lugares,
-      encontros: estado.navis,
+      idade: 9,
+      lugares: const [
+        Lugar(id: 1, nome: 'Biblioteca Velha', tipo: 'biblioteca', presentes: 2, voce: true),
+      ],
+      encontros: const [
+        NaviEncontrado(
+          nome: 'Zeta',
+          gm: false,
+          afinidade: 72,
+          encontros: 2,
+          tom: 'amistoso',
+          quando: 'há 5 min',
+          ultimaArea: 'Praça dos Bipes',
+          relato: 'Faísca e Zeta conversaram em Praça dos Bipes.',
+          cor: Colors.teal,
+        ),
+        NaviEncontrado(
+          nome: 'Iris',
+          gm: true,
+          afinidade: 60,
+          encontros: 1,
+          tom: 'indiferente',
+          quando: 'há 1 h',
+          ultimaArea: 'Biblioteca Velha',
+          relato: 'Faísca conheceu Iris.',
+          cor: Colors.cyan,
+        ),
+      ],
     );
-    expect(prompt, contains('Biblioteca Velha'));
-    expect(prompt, contains('Pixel (72)'));
-    expect(prompt, contains('Faísca achou engraçado')); // "Frost" vira o nome
+    expect(prompt, contains('Você tem 9 anos'));
+    expect(prompt, contains('Biblioteca Velha: 2 NAVIs aqui agora, incluindo o seu.'));
+    expect(prompt, contains('Zeta (72)'));
+    expect(prompt, contains('Iris (GM da cidade)'));
     expect(prompt, isNot(contains('Frost')));
     expect(prompt, contains('Se perguntarem sobre você'));
   });

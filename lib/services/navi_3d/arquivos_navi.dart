@@ -116,14 +116,23 @@ class ArquivosNavi extends ChangeNotifier {
     }
   }
 
-  Future<void> _carregarImportados() async {
-    if (kIsWeb) return; // na web o que foi importado não sobrevive à aba
+  /// Cria (ou acha) a pasta onde os arquivos importados ficam. Pode falhar
+  /// (testes, permissões, caminhos estranhos no Windows): nesse caso o app
+  /// segue sem pasta e importa só para a memória.
+  Future<void> _garantirPasta() async {
+    if (kIsWeb || _pasta != null) return;
     try {
       final docs = await getApplicationDocumentsDirectory();
       _pasta = await Directory('${docs.path}/navi').create(recursive: true);
     } catch (_) {
-      return; // sem pasta (ex.: testes): segue só com as imagens estáticas
+      _pasta = null;
     }
+  }
+
+  Future<void> _carregarImportados() async {
+    if (kIsWeb) return; // na web o que foi importado não sobrevive à aba
+    await _garantirPasta();
+    if (_pasta == null) return; // sem pasta: segue só com os embutidos
     final modelo = _arquivo('modelo.vrm');
     if (await modelo.exists()) {
       _modeloImportado = FonteArquivo(modelo, 'vrm');
@@ -140,7 +149,22 @@ class ArquivosNavi extends ChangeNotifier {
   }
 
   /// Abre o seletor de arquivos. Retorna uma mensagem de erro, ou null.
-  Future<String?> importarModelo() async {
+  /// Qualquer falha ao escolher ou ler o arquivo vira uma mensagem para a
+  /// pessoa, em vez de o botão simplesmente não fazer nada.
+  Future<String?> _seguro(Future<String?> Function() acao) async {
+    try {
+      return await acao();
+    } catch (e) {
+      return 'não consegui importar o arquivo ($e)';
+    }
+  }
+
+  Future<String?> importarModelo() => _seguro(_importarModelo);
+
+  Future<String?> importarAnimacao(Gesto gesto) =>
+      _seguro(() => _importarAnimacao(gesto));
+
+  Future<String?> _importarModelo() async {
     final escolhido = await _escolher();
     if (escolhido == null) return null;
     final info = lerGlbBytes(escolhido.cabecalho);
@@ -154,7 +178,7 @@ class ArquivosNavi extends ChangeNotifier {
     return null;
   }
 
-  Future<String?> importarAnimacao(Gesto gesto) async {
+  Future<String?> _importarAnimacao(Gesto gesto) async {
     final escolhido = await _escolher();
     if (escolhido == null) return null;
     final String extensao;
@@ -225,7 +249,9 @@ class ArquivosNavi extends ChangeNotifier {
   }
 
   Future<_Escolhido?> _escolher() async {
-    if (!kIsWeb && _pasta == null) return null;
+    // Tenta de novo a pasta (pode ter falhado na abertura do app), mas o
+    // seletor abre de qualquer jeito.
+    await _garantirPasta();
     final escolhido = await FilePicker.pickFile();
     if (escolhido == null) return null;
     final caminho = escolhido.path;

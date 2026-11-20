@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"navicity/internal/cidade"
+	"navicity/internal/gm"
 	"navicity/internal/sim"
 )
 
@@ -232,5 +233,124 @@ func TestClienteNaoRegistraComoGM(t *testing.T) {
 	})
 	if status, _ := a.enviar(a.pedido(c, "POST", "/navis", corpo)); status != http.StatusBadRequest {
 		t.Fatalf("cyber deveria dar 400, deu %d", status)
+	}
+}
+
+// ---------------------------------------------------------------- admin
+
+const tokenTeste = "chave-de-teste-bem-longa-0123456789"
+
+// ambienteAdmin sobe uma cidade com a Iris e as rotas /gm ligadas.
+func ambienteAdmin(t *testing.T, comToken bool) (*httptest.Server, *gm.Loja) {
+	t.Helper()
+	s := sim.Nova(sim.MapaInicial(), 1)
+	if err := s.Povoar([]sim.MembroElenco{sim.Iris()}); err != nil {
+		t.Fatal(err)
+	}
+	c := cidade.Nova(s, 1)
+	ctx, cancelar := context.WithCancel(context.Background())
+	feito := make(chan struct{})
+	go func() { defer close(feito); c.Rodar(ctx, time.Now()) }()
+	loja := gm.NovaLoja(t.TempDir())
+	srv := &Servidor{Cidade: c, Iris: loja}
+	if comToken {
+		srv.TokenAdmin = tokenTeste
+	}
+	h := httptest.NewServer(srv.Handler())
+	t.Cleanup(func() { h.Close(); cancelar(); <-feito })
+	return h, loja
+}
+
+func chamarAdmin(t *testing.T, base, metodo, token string, corpo any) (int, map[string]any) {
+	t.Helper()
+	var b []byte
+	if corpo != nil {
+		b, _ = json.Marshal(corpo)
+	}
+	r, _ := http.NewRequest(metodo, base+"/gm/iris", bytes.NewReader(b))
+	if token != "" {
+		r.Header.Set("Authorization", "Bearer "+token)
+	}
+	resp, err := http.DefaultClient.Do(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	var out map[string]any
+	_ = json.NewDecoder(resp.Body).Decode(&out)
+	return resp.StatusCode, out
+}
+
+func TestIrisDesligadaSemToken(t *testing.T) {
+	h, _ := ambienteAdmin(t, false)
+	if status, _ := chamarAdmin(t, h.URL, "GET", tokenTeste, nil); status != http.StatusNotFound {
+		t.Fatalf("sem NAVICITY_ADMIN_TOKEN a rota deveria dar 404, deu %d", status)
+	}
+}
+
+func TestIrisExigeAChaveDeAdministrador(t *testing.T) {
+	h, _ := ambienteAdmin(t, true)
+	for _, tok := range []string{"", "errada", tokenTeste + "x"} {
+		if status, _ := chamarAdmin(t, h.URL, "GET", tok, nil); status != http.StatusUnauthorized {
+			t.Fatalf("chave %q deveria dar 401, deu %d", tok, status)
+		}
+	}
+}
+
+func TestIrisLeEGravaConfiguracao(t *testing.T) {
+	h, loja := ambienteAdmin(t, true)
+	status, corpo := chamarAdmin(t, h.URL, "GET", tokenTeste, nil)
+	if status != http.StatusOK || corpo["elemento"] != "cyber" || corpo["nome"] != "Iris" {
+		t.Fatalf("GET: %d %v", status, corpo)
+	}
+
+	novo := map[string]any{
+		"tracos":        map[string]int{"coragem": 11, "curiosidade": 22, "paciencia": 33, "sociabilidade": 44, "agressividade": 55},
+		"personalidade": "Fala em rimas e adora a Biblioteca.",
+	}
+	if status, _ := chamarAdmin(t, h.URL, "PUT", tokenTeste, novo); status != http.StatusOK {
+		t.Fatalf("PUT: %d", status)
+	}
+	gravada, err := loja.Carregar()
+	if err != nil || gravada.Tracos.Sociabilidade != 44 || gravada.Personalidade != "Fala em rimas e adora a Biblioteca." {
+		t.Fatalf("não gravou: %+v %v", gravada, err)
+	}
+}
+
+func TestIrisRecusaConfiguracaoInvalida(t *testing.T) {
+	h, loja := ambienteAdmin(t, true)
+	ruim := map[string]any{"tracos": map[string]int{"coragem": 150}, "personalidade": ""}
+	if status, _ := chamarAdmin(t, h.URL, "PUT", tokenTeste, ruim); status != http.StatusBadRequest {
+		t.Fatalf("traço fora da faixa deveria dar 400, deu %d", status)
+	}
+	if status, _ := chamarAdmin(t, h.URL, "PUT", tokenTeste, map[string]any{"elemento": "fogo"}); status != http.StatusBadRequest {
+		t.Fatalf("campo desconhecido deveria dar 400, deu %d", status)
+	}
+	if i, _ := loja.Carregar(); i.Tracos.Coragem == 150 {
+		t.Fatal("configuração inválida não pode ser gravada")
+	}
+}
+
+func TestCORSLiberaLocalETailscaleEBloqueiaOResto(t *testing.T) {
+	h, _ := ambienteAdmin(t, true)
+	cabecalhoCORS := func(origem string) string {
+		r, _ := http.NewRequest("OPTIONS", h.URL+"/cidade", nil)
+		r.Header.Set("Origin", origem)
+		resp, err := http.DefaultClient.Do(r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		return resp.Header.Get("Access-Control-Allow-Origin")
+	}
+	for _, o := range []string{"http://localhost:8090", "http://100.98.182.120:8090"} {
+		if got := cabecalhoCORS(o); got != o {
+			t.Errorf("%s deveria ser liberada, veio %q", o, got)
+		}
+	}
+	for _, o := range []string{"https://exemplo.com", "http://192.168.0.5:8090"} {
+		if got := cabecalhoCORS(o); got != "" {
+			t.Errorf("%s não deveria ser liberada, veio %q", o, got)
+		}
 	}
 }

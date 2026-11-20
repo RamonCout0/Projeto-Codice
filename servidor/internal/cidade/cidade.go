@@ -144,6 +144,15 @@ func (c *Cidade) novoID() (sim.NaviID, error) {
 	return 0, errors.New("não consegui sortear um id livre")
 }
 
+// DefinirIris troca, com a cidade rodando, os traços da Iris.
+func (c *Cidade) DefinirIris(ctx context.Context, t dominio.Tracos) error {
+	var err error
+	if e := c.faz(ctx, func() { err = c.sim.DefinirTracosGM(sim.IDIris, t) }); e != nil {
+		return e
+	}
+	return err
+}
+
 // Chave devolve a chave pública do NAVI, para a API conferir assinaturas.
 func (c *Cidade) Chave(ctx context.Context, id sim.NaviID) (ed25519.PublicKey, bool) {
 	var (

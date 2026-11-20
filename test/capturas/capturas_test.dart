@@ -158,5 +158,11 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.text('Personalidade'));
     await tirar('12_personalidade');
+    await t.tap(find.byTooltip('voltar'));
+    await t.pumpAndSettle();
+    await t.tap(find.byTooltip('abrir menu').first);
+    await t.pumpAndSettle();
+    await t.tap(find.text('Iris · GM'));
+    await tirar('13_iris');
   }, skip: !ligado);
 }

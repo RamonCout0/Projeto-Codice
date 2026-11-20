@@ -69,6 +69,20 @@ func (s *Sim) AdicionarGM(id NaviID, apelido string, p dominio.Perfil, area Area
 	return s.adicionar(id, apelido, true, p, area)
 }
 
+// DefinirTracosGM troca, com a cidade rodando, os traços de um GM. Só vale
+// para GMs: os NAVIs dos jogadores nunca mudam de perfil por aqui.
+func (s *Sim) DefinirTracosGM(id NaviID, t dominio.Tracos) error {
+	n, ok := s.porID[id]
+	if !ok || !n.GM {
+		return fmt.Errorf("NAVI %d não é um GM da cidade", id)
+	}
+	if err := t.Validar(); err != nil {
+		return err
+	}
+	n.Perfil.Tracos = t
+	return nil
+}
+
 // Presentes diz quantos NAVIs estão parados numa área agora.
 func (s *Sim) Presentes(a AreaID) int {
 	if !s.mapa.valida(a) {

@@ -66,9 +66,15 @@ const IDIris NaviID = 0x1815
 
 // Iris é a game master da NAVICity: elemento Cyber, paciente e curiosa,
 // sociável com todo mundo e sem agressividade. Ela mora na Biblioteca.
-func Iris() MembroElenco {
-	// coragem, curiosidade, paciência, sociabilidade, agressividade
-	perfil, err := dominio.PerfilGM(dominio.Tracos{60, 85, 90, 70, 5})
+func Iris() MembroElenco { return IrisCom(TracosPadraoIris) }
+
+// TracosPadraoIris: coragem, curiosidade, paciência, sociabilidade,
+// agressividade. O dono da cidade pode trocá-los (veja internal/gm).
+var TracosPadraoIris = dominio.Tracos{60, 85, 90, 70, 5}
+
+// IrisCom monta a Iris com os traços escolhidos.
+func IrisCom(t dominio.Tracos) MembroElenco {
+	perfil, err := dominio.PerfilGM(t)
 	if err != nil {
 		panic(err) // valores fixos do código: erro aqui é bug, não entrada
 	}
@@ -77,7 +83,12 @@ func Iris() MembroElenco {
 
 // Residentes é quem já mora na cidade quando ela liga: a GM e os NAVIs de
 // teste. Quando o Postgres chegar, só a GM continua sendo da casa.
-func Residentes() []MembroElenco { return append([]MembroElenco{Iris()}, ElencoDeTeste()...) }
+func Residentes() []MembroElenco { return ResidentesCom(TracosPadraoIris) }
+
+// ResidentesCom é Residentes com a Iris já no jeito que o dono configurou.
+func ResidentesCom(iris dominio.Tracos) []MembroElenco {
+	return append([]MembroElenco{IrisCom(iris)}, ElencoDeTeste()...)
+}
 
 // Povoar põe os residentes na cidade.
 func (s *Sim) Povoar(elenco []MembroElenco) error {

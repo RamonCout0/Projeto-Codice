@@ -13,6 +13,7 @@ import 'package:codice_app/views/encontros/detalhe_navi_tela.dart';
 import 'package:codice_app/views/encontros/encontros_tela.dart';
 import 'package:codice_app/views/home/home_tela.dart';
 import 'package:codice_app/views/importar_navi_tela.dart';
+import 'package:codice_app/views/iris_config_tela.dart';
 import 'package:codice_app/views/perfil_navi_tela.dart';
 import 'package:codice_app/views/sessao_segura_tela.dart';
 
@@ -24,6 +25,7 @@ abstract final class Rotas {
   static const importar = '/importar';
   static const sessao = '/sessao';
   static const perfil = '/perfil';
+  static const iris = '/iris';
 
   // Raízes das abas e telas empilhadas dentro delas.
   static const navi = '/navi';
@@ -40,6 +42,7 @@ abstract final class Rotas {
     app: (_) => const AppShell(),
     configuracoes: (_) => const ConfiguracoesTela(),
     importar: (_) => const ImportarNaviTela(),
+    iris: (_) => const IrisConfigTela(),
     // arguments: true = logo depois de criar a conta (segue para o app).
     perfil: (c) => PerfilNaviTela(
       criando: ModalRoute.of(c)?.settings.arguments == true,

@@ -136,6 +136,12 @@ class MenuLateral extends StatelessWidget {
               onTap: () => _abrir(context, Rotas.importar),
             ),
             _Item(
+              icone: Ic.gm,
+              titulo: 'Iris · GM',
+              subtitulo: 'personalidade e jeito da game master',
+              onTap: () => _abrir(context, Rotas.iris),
+            ),
+            _Item(
               icone: Ic.config,
               titulo: 'Configurações',
               subtitulo: 'aparência, conversa e cidade',

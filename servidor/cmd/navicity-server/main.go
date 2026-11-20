@@ -10,6 +10,8 @@
 //
 //	TIME_SCALE  quantos segundos simulados por segundo real (padrão 1)
 //	SEMENTE     semente da aleatoriedade (padrão 42)
+//	NAVICITY_DADOS         pasta onde a configuração da Iris é gravada
+//	NAVICITY_ADMIN_TOKEN   chave de administrador (sem ela, /gm/* fica desligada)
 //	NAVICITY_ENDERECO  onde a API escuta, ex.: 0.0.0.0:8080 (vazio = sem API)
 package main
 
@@ -24,6 +26,7 @@ import (
 
 	"navicity/internal/api"
 	"navicity/internal/cidade"
+	"navicity/internal/gm"
 	"navicity/internal/sim"
 )
 
@@ -41,10 +44,14 @@ type config struct {
 	escala   float64
 	semente  uint64
 	endereco string // vazio = sem API
+
+	// dados é a pasta do iris.json; tokenAdmin libera /gm/*.
+	dados      string
+	tokenAdmin string
 }
 
 func lerConfig() (config, error) {
-	c := config{escala: 1, semente: 42, endereco: os.Getenv("NAVICITY_ENDERECO")}
+	c := config{escala: 1, semente: 42, endereco: os.Getenv("NAVICITY_ENDERECO"), dados: os.Getenv("NAVICITY_DADOS"), tokenAdmin: os.Getenv("NAVICITY_ADMIN_TOKEN")}
 	if v := os.Getenv("TIME_SCALE"); v != "" {
 		e, err := strconv.ParseFloat(v, 64)
 		if err != nil || e <= 0 {
@@ -69,7 +76,13 @@ func rodar() error {
 	}
 
 	s := sim.Nova(sim.MapaInicial(), cfg.semente)
-	if err := s.Povoar(sim.Residentes()); err != nil {
+	// A Iris nasce com a configuração que o dono gravou (ou a de fábrica).
+	loja := gm.NovaLoja(cfg.dados)
+	iris, err := loja.Carregar()
+	if err != nil {
+		return fmt.Errorf("configuração da Iris: %w", err)
+	}
+	if err := s.Povoar(sim.ResidentesCom(iris.Tracos.Dominio())); err != nil {
 		return err
 	}
 	c := cidade.Nova(s, cfg.escala)
@@ -100,7 +113,10 @@ func rodar() error {
 		return nil
 	}
 	fmt.Printf("API em http://%s\n", cfg.endereco)
-	srv := &api.Servidor{Cidade: c}
+	srv := &api.Servidor{Cidade: c, TokenAdmin: cfg.tokenAdmin, Iris: loja}
+	if cfg.tokenAdmin == "" {
+		fmt.Println("configuração da Iris desligada (defina NAVICITY_ADMIN_TOKEN para ligar)")
+	}
 	err = srv.Servir(ctx, cfg.endereco)
 	parar()
 	<-feito

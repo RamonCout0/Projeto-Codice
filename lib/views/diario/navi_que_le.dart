@@ -33,7 +33,7 @@ class NaviQueLe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const legenda = TextStyle(color: Color(0xFF8D879B), fontSize: 9);
+    const legenda = TextStyle(color: Color(0xFF8D879B), fontSize: 11);
     return Column(
       children: [
         Row(
@@ -71,7 +71,7 @@ class NaviQueLe extends StatelessWidget {
                 'toque · dois toques · segure',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Cores.textoFraco, fontSize: 9),
+                style: TextStyle(color: Cores.textoFraco, fontSize: 11),
               ),
             ),
             const SizedBox(width: 10),
@@ -105,7 +105,7 @@ class NaviQueLe extends StatelessWidget {
                 '${context.watch<Sessao>().perfil.nome} · 8 anos',
                 style: TextStyle(
                   color: Cores.textoSecundario,
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -113,7 +113,7 @@ class NaviQueLe extends StatelessWidget {
               if (carinhos > 0)
                 Text(
                   '♥ $carinhos',
-                  style: const TextStyle(color: Cores.rosa, fontSize: 9),
+                  style: const TextStyle(color: Cores.rosa, fontSize: 11),
                 ),
             ],
           ),
@@ -122,7 +122,7 @@ class NaviQueLe extends StatelessWidget {
             fala,
             style: const TextStyle(
               color: Cores.texto,
-              fontSize: 12,
+              fontSize: 13,
               height: 1.3,
             ),
           ),

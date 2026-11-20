@@ -106,7 +106,7 @@ class _ConfiguracoesTelaState extends State<ConfiguracoesTela> {
                           color: _resultadoTeste!.startsWith('conectado ·')
                               ? Cores.verde
                               : Cores.ambar,
-                          fontSize: 11,
+                          fontSize: 12,
                         ),
                       ),
                     ),

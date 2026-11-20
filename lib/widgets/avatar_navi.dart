@@ -128,12 +128,12 @@ class _SemModelo extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 temModelo ? 'o 3D não aparece aqui' : 'nenhum modelo 3D',
-                style: const TextStyle(color: Cores.textoApagado, fontSize: 12),
+                style: const TextStyle(color: Cores.textoApagado, fontSize: 13),
               ),
               if (!temModelo)
                 const Text(
                   'toque para importar um .vrm',
-                  style: TextStyle(color: Cores.textoFraco, fontSize: 11),
+                  style: TextStyle(color: Cores.textoFraco, fontSize: 12),
                 ),
             ],
           ),

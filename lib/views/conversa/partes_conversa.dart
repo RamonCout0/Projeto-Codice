@@ -49,7 +49,7 @@ class BalaoUsuario extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 240),
         child: Painel(
           cor: Cores.roxoAtivo,
-          borda: const Color(0xFF49396F),
+          borda: Cores.bordaRoxa,
           raio: const BorderRadius.only(
             topLeft: _raioBalao,
             topRight: _raioBalao,
@@ -59,7 +59,7 @@ class BalaoUsuario extends StatelessWidget {
             texto,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
           ),

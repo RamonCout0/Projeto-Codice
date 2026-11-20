@@ -63,7 +63,7 @@ class RodapeDiario extends StatelessWidget {
               shape: const CircleBorder(),
               backgroundColor: Cores.roxoFundo,
               foregroundColor: Cores.roxo,
-              side: const BorderSide(color: Color(0xFF493A70)),
+              side: const BorderSide(color: Cores.bordaRoxa),
             ),
             child: const Icon(Icons.delete_outline, size: 20),
           ),

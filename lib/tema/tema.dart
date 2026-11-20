@@ -6,15 +6,22 @@ import 'package:codice_app/tema/estilos.dart';
 /// SnackBars e campos já saem com a cara do Códice, sem estilo nas telas.
 ThemeData criarTema() {
   final arredondado = RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(13),
+    borderRadius: BorderRadius.circular(16),
   );
-  const tamanhoBotao = Size.fromHeight(44);
-  const textoBotao = TextStyle(fontSize: 13, fontWeight: FontWeight.bold);
+  const tamanhoBotao = Size.fromHeight(50);
+  const textoBotao = TextStyle(fontSize: 15, fontWeight: FontWeight.w700);
 
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: Cores.fundo,
+    // Transições suaves e iguais em todas as plataformas.
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
     colorScheme: ColorScheme.fromSeed(
       seedColor: Cores.roxo,
       brightness: Brightness.dark,
@@ -45,7 +52,7 @@ ThemeData criarTema() {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: Cores.roxoClaro,
-        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
       ),
     ),
     appBarTheme: const AppBarTheme(
@@ -55,35 +62,35 @@ ThemeData criarTema() {
       centerTitle: false,
       titleTextStyle: TextStyle(
         color: Colors.white,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
+        fontSize: 19,
+        fontWeight: FontWeight.w700,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Cores.painel,
-      labelStyle: const TextStyle(color: Cores.textoApagado, fontSize: 13),
-      hintStyle: const TextStyle(color: Cores.textoFraco, fontSize: 13),
+      labelStyle: const TextStyle(color: Cores.textoApagado, fontSize: 14),
+      hintStyle: const TextStyle(color: Cores.textoFraco, fontSize: 14),
       prefixIconColor: Cores.textoApagado,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Cores.borda),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Cores.borda),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Cores.roxo, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Cores.vermelho),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Cores.vermelho, width: 1.5),
       ),
     ),
@@ -91,8 +98,8 @@ ThemeData criarTema() {
       backgroundColor: Cores.painel,
       selectedColor: Cores.roxoAtivo,
       side: const BorderSide(color: Cores.borda),
-      labelStyle: const TextStyle(color: Cores.textoSuave, fontSize: 12),
-      secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 12),
+      labelStyle: const TextStyle(color: Cores.textoSuave, fontSize: 13),
+      secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 13),
       checkmarkColor: Cores.roxoClaro,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),
@@ -117,17 +124,17 @@ ThemeData criarTema() {
       titleTextStyle: Estilos.tituloDialogo,
       contentTextStyle: Estilos.corpo,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(24),
         side: const BorderSide(color: Cores.linha),
       ),
     ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: Cores.roxoFundo,
-      contentTextStyle: const TextStyle(color: Colors.white, fontSize: 12),
+      contentTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
       actionTextColor: Cores.roxo,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: Cores.roxoBorda),
       ),
     ),
@@ -135,11 +142,16 @@ ThemeData criarTema() {
       backgroundColor: Cores.painel,
       showDragHandle: true,
     ),
-    drawerTheme: const DrawerThemeData(backgroundColor: Cores.painel),
+    drawerTheme: const DrawerThemeData(
+      backgroundColor: Cores.painel,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(28)),
+      ),
+    ),
     navigationBarTheme: NavigationBarThemeData(
       labelTextStyle: WidgetStateProperty.resolveWith(
         (s) => TextStyle(
-          fontSize: 10,
+          fontSize: 11,
           color: s.contains(WidgetState.selected)
               ? Cores.roxoClaro
               : Cores.textoApagado,
@@ -160,7 +172,7 @@ ThemeData criarTema() {
       ),
     ),
     listTileTheme: const ListTileThemeData(
-      titleTextStyle: TextStyle(color: Cores.texto, fontSize: 13),
+      titleTextStyle: TextStyle(color: Cores.texto, fontSize: 15, fontWeight: FontWeight.w600),
       subtitleTextStyle: Estilos.legenda,
     ),
   );
